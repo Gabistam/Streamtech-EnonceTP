@@ -1,0 +1,3393 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>StreamTech React (corrigé)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : grille Bento 4 colonnes (1 sur mobile), tuiles arrondies 28px, une idée par tuile, ordre HTML = ordre de lecture */
+:root{
+  --bg:#eceef2; --tile:#ffffff; --ink:#16181d; --muted:#4a5060; --accent:#2563eb; --accent-ink:#ffffff;
+  --blue:#e8efff; --peach:#ffeede; --mint:#e2f6ea; --lilac:#f1e8ff; --rose:#ffe8e6;
+  --line:#dfe3ea; --ok:#16a34a; --code-bg:#16181d; --code-head:#23262e; --code-ink:#e6e9f0;
+  --f-text:"Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --r:28px; --gap:16px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-text);font-size:16px;line-height:1.6;margin:0}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:24px 48px}
+@media(min-width:700px){.wrap{padding-inline:24px}}
+h1,h2,h3{text-wrap:balance;margin:0;line-height:1.2}
+p{margin:0}
+code,kbd{font-family:var(--f-mono);font-size:.88em}
+:not(pre)>code{background:rgba(22,24,29,.07);padding:.1em .4em;border-radius:6px}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:8px}
+
+/* Grille */
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--gap)}
+.s1{grid-column:span 1}.s2{grid-column:span 2}.s3{grid-column:span 3}.s4{grid-column:span 4}
+@media(max-width:960px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.s3,.s4{grid-column:span 2}}
+@media(max-width:640px){.grid{grid-template-columns:minmax(0,1fr)}.s1,.s2,.s3,.s4{grid-column:auto}}
+
+/* Tuiles */
+.tile{background:var(--tile);border-radius:var(--r);padding:24px;min-width:0;display:flex;flex-direction:column;gap:14px}
+@media(max-width:640px){.tile{padding:20px}}
+.t-blue{background:var(--blue)}.t-peach{background:var(--peach)}.t-mint{background:var(--mint)}.t-lilac{background:var(--lilac)}.t-rose{background:var(--rose)}
+.tile-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.tile-head>div{flex:1;min-width:0}
+.icon-bg{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;flex:none;background:var(--blue);color:var(--accent)}
+.tile:not(.t-blue):not(.t-peach):not(.t-mint):not(.t-lilac):not(.t-rose) .icon-bg.ib-peach{background:var(--peach);color:#9a3c00}
+.tile:not(.t-blue):not(.t-peach):not(.t-mint):not(.t-lilac):not(.t-rose) .icon-bg.ib-mint{background:var(--mint);color:#166534}
+.tile:not(.t-blue):not(.t-peach):not(.t-mint):not(.t-lilac):not(.t-rose) .icon-bg.ib-lilac{background:var(--lilac);color:#6b21a8}
+.t-blue .icon-bg,.t-peach .icon-bg,.t-mint .icon-bg,.t-lilac .icon-bg,.t-rose .icon-bg{background:rgba(255,255,255,.8)}
+.t-peach .icon-bg{color:#9a3c00}.t-mint .icon-bg{color:#166534}.t-lilac .icon-bg{color:#6b21a8}.t-rose .icon-bg{color:#9f1239}
+.icon-bg svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.section-title{font-size:1.15rem;font-weight:800}
+.tile p,.tile li{max-width:68ch}
+.tile ul,.tile ol{margin:0;padding-left:1.2em;display:grid;gap:6px}
+.muted{color:var(--muted)}
+
+/* Familles */
+.ftag{font-size:.74rem;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap;border:1px solid rgba(22,24,29,.08)}
+.f1{background:#dbe6ff;color:#1d4ed8}.f2{background:#ffe0c2;color:#8a3500}.f3{background:#cdeedb;color:#166534}.f4{background:#e6d6ff;color:#6b21a8}.f5{background:#ffd6d1;color:#9f1239}
+
+/* En-tête */
+.hero{gap:18px;justify-content:space-between}
+.hero h1{font-size:clamp(1.8rem,3.6vw,2.8rem);font-weight:800;letter-spacing:-.02em}
+.hero .lede{font-size:1.08rem;color:var(--muted);max-width:62ch}
+.badges,.pills{display:flex;flex-wrap:wrap;gap:8px}
+.badge{background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:.8rem;padding:6px 12px;border-radius:999px}
+.badge.ghost{background:var(--blue);color:#1d4ed8}
+.pill{font-size:.82rem;font-weight:600;padding:6px 12px;border-radius:999px}
+.p-blue{background:var(--blue);color:#1d4ed8}.p-peach{background:var(--peach);color:#8a3500}.p-mint{background:var(--mint);color:#166534}.p-lilac{background:var(--lilac);color:#6b21a8}.p-rose{background:var(--rose);color:#9f1239}
+.big{font-size:3.4rem;font-weight:800;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.bar{height:14px;border-radius:999px;background:rgba(255,255,255,.85);overflow:hidden}
+.bar span{display:block;height:100%;width:0;background:var(--ok);border-radius:999px;transition:width .35s ease}
+
+/* Onglets */
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:14px;margin-block:4px 6px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:thin}
+.tab{font:inherit;font-weight:700;font-size:.9rem;border:0;background:var(--tile);color:var(--ink);padding:10px 16px;border-radius:999px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.tab:hover{background:#dde5f7}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.tab .cnt{font-size:.72rem;font-variant-numeric:tabular-nums;background:rgba(22,24,29,.08);padding:2px 7px;border-radius:999px}
+.tab[aria-selected="true"] .cnt{background:rgba(255,255,255,.22)}
+.tab .cnt.full{background:#cdeedb;color:#166534}
+
+/* Sarah */
+.sarah{display:flex;gap:12px;align-items:flex-start;margin:0;background:rgba(255,255,255,.7);border-radius:18px;padding:14px 16px}
+.tile:not(.t-blue):not(.t-peach):not(.t-mint):not(.t-lilac):not(.t-rose) .sarah{background:var(--bg)}
+.sarah .av{flex:none;width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;display:grid;place-items:center;font-size:.9rem}
+.sarah p{font-style:normal}
+.sarah b{display:block;font-size:.8rem;color:var(--muted);margin-bottom:2px}
+
+/* Étapes */
+.steps{list-style:none;padding:0!important;counter-reset:st;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px!important}
+@media(max-width:800px){.steps{grid-template-columns:minmax(0,1fr)}}
+.steps>li{counter-increment:st;background:var(--bg);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0;max-width:none!important}
+.steps>li h4{margin:0;font-size:1rem;display:flex;gap:10px;align-items:center}
+.steps>li h4::before{content:counter(st);width:26px;height:26px;border-radius:9px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:.8rem;flex:none}
+.steps>li.wide{grid-column:1/-1}
+
+/* Code */
+.code{min-width:0;display:flex;flex-direction:column}
+.code-body{background:var(--code-bg);border-radius:18px;overflow:hidden;min-width:0}
+.code-head{display:flex;align-items:center;gap:10px;padding:8px 10px 8px 14px;background:var(--code-head);color:#b9c0cf;font-family:var(--f-mono);font-size:.76rem}
+.code-file{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#e6e9f0}
+.code-lang{text-transform:uppercase;letter-spacing:.06em;color:#9aa3b5}
+.copy{font:600 .76rem var(--f-text);background:#343844;color:#fff;border:0;border-radius:999px;padding:5px 12px;cursor:pointer}
+.copy:hover{background:var(--accent)}
+.code pre{margin:0;padding:14px 16px;overflow:auto;max-height:540px;font-family:var(--f-mono);font-size:.82rem;line-height:1.6;color:var(--code-ink);tab-size:2}
+.code pre code{background:none;padding:0;font-size:inherit;color:inherit}
+.token.comment,.token.prolog{color:#8b93a7;font-style:italic}
+.token.keyword,.token.module,.token.control-flow{color:#c9a8ff}
+.token.string,.token.template-string,.token.attr-value{color:#9be3a8}
+.token.function{color:#7cc4ff}
+.token.tag,.token.selector{color:#ff9e8a}
+.token.attr-name,.token.property{color:#ffd58a}
+.token.number,.token.boolean{color:#ffb86b}
+.token.punctuation,.token.operator{color:#c9cfdb}
+.token.class-name,.token.builtin{color:#7cc4ff}
+.token.template-punctuation,.token.interpolation-punctuation{color:#ffb86b}
+
+/* Tableaux */
+.tbl{overflow-x:auto;border-radius:16px;background:rgba(255,255,255,.75)}
+.tbl table{border-collapse:collapse;width:100%;font-size:.88rem}
+.tbl th,.tbl td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td:first-child{font-weight:700;white-space:nowrap}
+
+/* Points de vérification */
+.checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+.check{display:flex;gap:10px;align-items:flex-start;background:rgba(255,255,255,.75);border-radius:14px;padding:10px 12px;cursor:pointer;font-weight:500}
+.check input{appearance:none;width:22px;height:22px;flex:none;border-radius:7px;border:2px solid #9aa3b5;background:#fff;cursor:pointer;display:grid;place-items:center;margin-top:1px}
+.check input:checked{background:var(--ok);border-color:var(--ok)}
+.check input:checked::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.check:has(input:checked) span{color:var(--muted);text-decoration:line-through}
+
+/* Divers */
+.dodont{display:grid;gap:8px}
+.dd{border-radius:14px;padding:10px 12px;background:rgba(255,255,255,.75);font-size:.92rem}
+.dd b{margin-right:6px}
+.kv{display:grid;gap:8px}
+.kv div{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:rgba(255,255,255,.75);border-radius:14px;padding:10px 12px}
+.kv span{font-weight:700;min-width:120px}
+.kv code{word-break:break-all}
+.result{gap:18px}
+.result .score{font-size:clamp(3.2rem,8vw,5.4rem);font-weight:800;line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.result .score small{font-size:.4em;color:var(--muted);letter-spacing:0}
+.btn-ghost{font:700 .85rem var(--f-text);background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:8px 16px;cursor:pointer;align-self:flex-start}
+.tagrow{display:flex;flex-wrap:wrap;gap:8px}
+.panel[hidden]{display:none!important}
+.panel{display:grid;gap:var(--gap)}
+.sec-intro{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding:6px 4px 2px}
+.sec-intro h2{font-size:1.5rem;font-weight:800;letter-spacing:-.01em}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19V5a2 2 0 0 1 2-2h14v14H6a2 2 0 0 0-2 2 2 2 0 0 0 2 2h14"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 4l-4 16"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-terminal" viewBox="0 0 24 24"><path d="m4 17 6-5-6-5M12 19h8"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.2-8.2M17 6l2 2M15 8l2 2"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.01"/></symbol>
+  <symbol id="i-table" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/></symbol>
+  <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8a3 3 0 0 0 0-6H8a3 3 0 0 1 0-6h8"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4h11l-2 4 2 4H5"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></symbol>
+  <symbol id="i-form" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></symbol>
+</svg>
+
+<div class="wrap">
+
+<header class="grid">
+  <section class="tile s3 hero">
+    <div class="badges"><span class="badge">Cas pratique · ReactJS</span><span class="badge ghost">Débutant React</span></div>
+    <h1>StreamTech : ton premier projet React</h1>
+    <p class="lede">Premier jour de stage chez StreamTech, une startup de streaming. Avec Sarah, développeuse senior et ta mentore, tu construis de A à Z une application de critiques de films branchée sur l'API TMDB, un gestionnaire de tâches et une page de contact.</p>
+    <div class="pills">
+      <span class="pill p-rose">Version corrigée</span>
+      <span class="pill p-blue">1 journée guidée</span>
+      <span class="pill p-peach">Vite + React</span>
+      <span class="pill p-mint">React Router v6</span>
+      <span class="pill p-lilac">Bootstrap 5</span>
+      <span class="pill p-rose">TMDB · JSONPlaceholder</span>
+    </div>
+  </section>
+  <section class="tile s1 t-mint" aria-label="Progression">
+    <p class="eyebrow">Ta progression</p>
+    <p class="big"><span id="pct">0</span>%</p>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="bar"><span id="barFill"></span></div>
+    <p class="muted"><span id="done">0</span> / <span id="total">0</span> points de vérification</p>
+  </section>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Sections du cas pratique">
+  <button class="tab" role="tab" data-tab="brief" id="tab-brief">Brief &amp; setup <span class="cnt"></span></button>
+  <button class="tab" role="tab" data-tab="base" id="tab-base">Composants &amp; state <span class="cnt"></span></button>
+  <button class="tab" role="tab" data-tab="api" id="tab-api">useEffect &amp; API <span class="cnt"></span></button>
+  <button class="tab" role="tab" data-tab="router" id="tab-router">Navigation <span class="cnt"></span></button>
+  <button class="tab" role="tab" data-tab="todos" id="tab-todos">Todos &amp; formulaires <span class="cnt"></span></button>
+  <button class="tab" role="tab" data-tab="bonus" id="tab-bonus">Contact &amp; bonus <span class="cnt"></span></button>
+  <button class="tab" role="tab" data-tab="bilan" id="tab-bilan">Bilan <span class="cnt"></span></button>
+</nav>
+
+<!-- ============ BRIEF ============ -->
+<main>
+<section class="panel" id="brief" role="tabpanel" aria-labelledby="tab-brief">
+  <div class="sec-intro"><h2>Brief &amp; installation</h2><span class="muted">Prépare ton environnement avant d'écrire la première ligne de React.</span></div>
+  <div class="grid">
+    <article class="tile s2 t-peach">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-chat"/></svg></span><div><p class="eyebrow">Contexte</p><h3 class="section-title">Bienvenue chez StreamTech</h3></div></div>
+      <p>StreamTech développe des applications de streaming et de gestion de contenu. Pour ton premier jour, Sarah te propose de créer un projet complet qui fait le tour de React.</p>
+      <blockquote class="sarah"><span class="av">S</span><p><b>Sarah</b>On construit une app de critiques de films avec l'API TMDB, plus une section de gestion de tâches et un formulaire de contact. Prêt à coder ?</p></blockquote>
+    </article>
+
+    <article class="tile s2 t-blue">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-target"/></svg></span><div><p class="eyebrow">Programme</p><h3 class="section-title">Ce que tu vas apprendre</h3></div></div>
+      <div class="tagrow">
+        <span class="ftag f1">Composants fonctionnels</span><span class="ftag f1">Props</span>
+        <span class="ftag f2">useState</span><span class="ftag f2">Rendu conditionnel</span><span class="ftag f2">Listes &amp; keys</span>
+        <span class="ftag f3">useEffect &amp; appels API</span>
+        <span class="ftag f4">React Router</span>
+        <span class="ftag f5">Formulaires contrôlés</span>
+      </div>
+      <p class="muted"><strong>Bonus si on a le temps :</strong> <code>useContext</code> (état global) et <code>useReducer</code> (état complexe).</p>
+    </article>
+
+    <article class="tile s4">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-terminal"/></svg></span><div><p class="eyebrow">Setup</p><h3 class="section-title">Installer l'environnement</h3></div></div>
+      <p>On crée le projet avec <strong>Vite</strong> : beaucoup plus rapide que Create React App, et c'est la méthode recommandée aujourd'hui.</p>
+      <ol class="steps">
+        <li>
+          <h4>Vérifier Node.js</h4>
+          <p>Ouvre ton terminal. Il te faut Node.js <strong>20.19 ou plus récent</strong> (version exigée par les versions actuelles de Vite). Sinon, installe la version LTS depuis nodejs.org.</p>
+          <div class="code" data-lang="bash" data-file="Terminal"><script type="text/plain">
+node --version
+npm --version
+</script></div>
+        </li>
+        <li>
+          <h4>Créer le projet avec Vite</h4>
+          <p>Si Vite pose des questions, garde <strong>React</strong> et <strong>JavaScript</strong>. Pas besoin de TypeScript pour l'instant.</p>
+          <div class="code" data-lang="bash" data-file="Terminal"><script type="text/plain">
+npm create vite@latest streamtech-app -- --template react
+cd streamtech-app
+npm install
+</script></div>
+        </li>
+        <li>
+          <h4>Installer Bootstrap</h4>
+          <p>Rapide à mettre en place, rendu professionnel tout de suite. Ajoute ensuite l'import <strong>tout en haut</strong> de <code>src/main.jsx</code>.</p>
+          <div class="code" data-lang="bash" data-file="Terminal"><script type="text/plain">
+npm install bootstrap
+</script></div>
+          <div class="code" data-lang="jsx" data-file="src/main.jsx"><script type="text/plain">
+import 'bootstrap/dist/css/bootstrap.min.css';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+</script></div>
+        </li>
+        <li>
+          <h4>Installer React Router</h4>
+          <p>L'application aura plusieurs pages (films, todos, contact) : il faut un routeur pour gérer la navigation.</p>
+          <div class="code" data-lang="bash" data-file="Terminal"><script type="text/plain">
+npm install react-router-dom
+</script></div>
+        </li>
+        <li class="wide">
+          <h4>Lancer le serveur de développement</h4>
+          <p>Ouvre <code>http://localhost:5173</code> : la page par défaut de Vite doit s'afficher.</p>
+          <div class="code" data-lang="bash" data-file="Terminal"><script type="text/plain">
+npm run dev
+</script></div>
+        </li>
+      </ol>
+    </article>
+
+    <article class="tile s2 t-lilac">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-folder"/></svg></span><div><p class="eyebrow">Architecture</p><h3 class="section-title">Structure du projet</h3></div></div>
+      <p>Une structure propre dès le départ. Les fichiers seront créés au fur et à mesure.</p>
+      <div class="code" data-lang="none" data-file="streamtech-app/"><script type="text/plain">
+streamtech-app/
+├── src/
+│   ├── components/      # Composants réutilisables
+│   │   ├── Navbar.jsx
+│   │   ├── MovieCard.jsx
+│   │   ├── MovieList.jsx
+│   │   ├── SearchBar.jsx
+│   │   ├── TodoItem.jsx
+│   │   └── ...
+│   ├── pages/           # Pages principales
+│   │   ├── Home.jsx
+│   │   ├── MovieDetails.jsx
+│   │   ├── Todos.jsx
+│   │   └── Contact.jsx
+│   ├── services/        # Appels API
+│   │   ├── tmdbApi.js
+│   │   └── todosApi.js
+│   ├── App.jsx          # Composant racine + Router
+│   ├── main.jsx         # Point d'entrée
+│   └── index.css        # Styles globaux
+├── package.json
+└── vite.config.js
+</script></div>
+    </article>
+
+    <article class="tile s2 t-blue">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-key"/></svg></span><div><p class="eyebrow">À noter</p><h3 class="section-title">Informations pour la suite</h3></div></div>
+      <div class="kv">
+        <div><span>Clé API TMDB</span><code>08a341931ab5f5dcee467baeb4a68c76</code></div>
+        <div><span>TMDB</span><code>https://api.themoviedb.org/3/</code></div>
+        <div><span>JSONPlaceholder</span><code>https://jsonplaceholder.typicode.com/todos</code></div>
+      </div>
+      <blockquote class="sarah"><span class="av">S</span><p><b>Sarah</b>Garde ces infos sous la main, on s'en sert très vite pour nos appels API.</p></blockquote>
+    </article>
+
+    <article class="tile s4 t-mint">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-check"/></svg></span><div><p class="eyebrow">Point de vérification</p><h3 class="section-title">Avant de continuer</h3></div></div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="c-brief-1" data-check><span>Node.js et npm installés</span></label>
+        <label class="check"><input type="checkbox" id="c-brief-2" data-check><span>Projet Vite créé et lancé</span></label>
+        <label class="check"><input type="checkbox" id="c-brief-3" data-check><span>Bootstrap importé dans <code>main.jsx</code></span></label>
+        <label class="check"><input type="checkbox" id="c-brief-4" data-check><span>React Router installé</span></label>
+        <label class="check"><input type="checkbox" id="c-brief-5" data-check><span>L'app tourne sur <code>localhost:5173</code></span></label>
+        <label class="check"><input type="checkbox" id="c-brief-6" data-check><span>La page par défaut de Vite s'affiche</span></label>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ COMPOSANTS / PROPS / STATE ============ -->
+<section class="panel" id="base" role="tabpanel" aria-labelledby="tab-base" hidden>
+  <div class="sec-intro"><h2>Composants, props et state</h2><span class="muted">Les trois piliers de React : maîtrise-les et tu maîtrises React.</span></div>
+  <div class="grid">
+    <article class="tile s2 t-blue">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-book"/></svg></span><div><p class="eyebrow">Théorie</p><h3 class="section-title">Les composants fonctionnels</h3></div><span class="ftag f1">Composants</span></div>
+      <p>En React, tout est composant. Comme une brique LEGO : petit, réutilisable, assemblable. Un composant est une fonction JavaScript qui retourne du JSX (du HTML dans du JS).</p>
+      <div class="code" data-lang="jsx" data-file="Exemple"><script type="text/plain">
+// Un composant simple
+function MonComposant() {
+  return (
+    <div>
+      <h1>Bonjour !</h1>
+    </div>
+  );
+}
+</script></div>
+      <ol>
+        <li>Le nom commence toujours par une <strong>majuscule</strong>.</li>
+        <li>Il retourne du <strong>JSX</strong>.</li>
+        <li>Un seul élément racine (d'où le <code>&lt;div&gt;</code> qui englobe tout).</li>
+      </ol>
+    </article>
+
+    <article class="tile s2">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">Ton premier composant</h3></div><span class="ftag f1">Composants</span></div>
+      <p>Crée <code>src/components/Welcome.jsx</code>, puis remplace tout le contenu de <code>App.jsx</code> pour l'afficher.</p>
+      <div class="code" data-lang="jsx" data-file="src/components/Welcome.jsx"><script type="text/plain">
+// src/components/Welcome.jsx
+function Welcome() {
+  return (
+    <div className="container mt-5">
+      <div className="alert alert-info">
+        <h1>🎬 Bienvenue sur StreamTech</h1>
+        <p>Votre application de critiques de films</p>
+      </div>
+    </div>
+  );
+}
+
+export default Welcome;
+</script></div>
+      <div class="code" data-lang="jsx" data-file="src/App.jsx"><script type="text/plain">
+// src/App.jsx
+import Welcome from './components/Welcome'
+
+function App() {
+  return (
+    <div>
+      <Welcome />
+    </div>
+  )
+}
+
+export default App
+</script></div>
+      <p class="muted"><strong>Résultat attendu :</strong> un message de bienvenue sur fond bleu (Bootstrap).</p>
+    </article>
+
+    <article class="tile s2 t-blue">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-book"/></svg></span><div><p class="eyebrow">Théorie</p><h3 class="section-title">Les props</h3></div><span class="ftag f1">Props</span></div>
+      <p>Les props sont les <strong>arguments</strong> d'un composant, comme les paramètres d'une fonction. Elles rendent un composant réutilisable et paramétrable.</p>
+      <div class="code" data-lang="jsx" data-file="Exemple"><script type="text/plain">
+// Composant qui reçoit des props
+function Greeting(props) {
+  return <h1>Bonjour {props.name} !</h1>;
+}
+
+// Utilisation
+<Greeting name="Sarah" />
+// Affiche : Bonjour Sarah !
+
+// Version destructurée (plus propre)
+function Greeting({ name, age }) {
+  return <h1>Bonjour {name}, tu as {age} ans</h1>;
+}
+</script></div>
+    </article>
+
+    <article class="tile s2">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">Une carte de film réutilisable</h3></div><span class="ftag f1">Props</span></div>
+      <p>Crée <code>src/components/MovieCard.jsx</code>, puis affiche trois cartes dans <code>App.jsx</code> avec des props différentes.</p>
+      <div class="code" data-lang="jsx" data-file="src/components/MovieCard.jsx"><script type="text/plain">
+// src/components/MovieCard.jsx
+function MovieCard({ title, year, rating, poster }) {
+  return (
+    <div className="col-md-3 mb-4">
+      <div className="card h-100">
+        <img
+          src={poster}
+          className="card-img-top"
+          alt={title}
+          style={{ height: '400px', objectFit: 'cover' }}
+        />
+        <div className="card-body">
+          <h5 className="card-title">{title}</h5>
+          <p className="card-text">
+            <span className="badge bg-primary">{year}</span>
+            <span className="badge bg-warning ms-2">⭐ {rating}/10</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default MovieCard;
+</script></div>
+      <div class="code" data-lang="jsx" data-file="src/App.jsx"><script type="text/plain">
+// src/App.jsx
+import MovieCard from './components/MovieCard'
+
+function App() {
+  return (
+    <div className="container mt-5">
+      <h1 className="mb-4">Films Populaires</h1>
+      <div className="row">
+        <MovieCard
+          title="Inception"
+          year={2010}
+          rating={8.8}
+          poster="https://image.tmdb.org/t/p/w500/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg"
+        />
+        <MovieCard
+          title="Interstellar"
+          year={2014}
+          rating={8.6}
+          poster="https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg"
+        />
+        <MovieCard
+          title="The Dark Knight"
+          year={2008}
+          rating={9.0}
+          poster="https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg"
+        />
+      </div>
+    </div>
+  )
+}
+
+export default App
+</script></div>
+      <p class="muted"><strong>Résultat attendu :</strong> trois cartes côte à côte, un seul composant réutilisé trois fois.</p>
+    </article>
+
+    <article class="tile s2 t-blue">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-book"/></svg></span><div><p class="eyebrow">Théorie</p><h3 class="section-title">Le state avec useState</h3></div><span class="ftag f2">State</span></div>
+      <p>Les props viennent de l'extérieur. Le <strong>state</strong> est la mémoire interne du composant : un compteur, un champ de formulaire, un bouton on/off.</p>
+      <div class="code" data-lang="jsx" data-file="Exemple"><script type="text/plain">
+import { useState } from 'react';
+
+function Counter() {
+  // [valeur actuelle, fonction pour la modifier]
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <p>Compteur : {count}</p>
+      <button onClick={() => setCount(count + 1)}>
+        +1
+      </button>
+    </div>
+  );
+}
+</script></div>
+      <ul>
+        <li><code>useState(0)</code> : état initial à 0</li>
+        <li><code>count</code> : valeur actuelle</li>
+        <li><code>setCount</code> : fonction qui modifie l'état</li>
+      </ul>
+    </article>
+
+    <article class="tile s2 t-rose">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-alert"/></svg></span><div><p class="eyebrow">Piège classique</p><h3 class="section-title">Ne jamais modifier le state directement</h3></div></div>
+      <div class="dodont">
+        <div class="dd"><b>❌</b><code>count = count + 1</code> : React ne voit pas le changement, l'écran ne se met pas à jour.</div>
+        <div class="dd"><b>✅</b><code>setCount(count + 1)</code> : React enregistre la nouvelle valeur et relance le rendu.</div>
+      </div>
+      <p>Même règle pour les props : elles sont en <strong>lecture seule</strong>. Un composant ne modifie jamais les props qu'il reçoit.</p>
+    </article>
+
+    <article class="tile s4">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">Un compteur de likes sur chaque carte</h3></div><span class="ftag f2">State</span></div>
+      <p>Modifie <code>MovieCard.jsx</code> : deux états, <code>likes</code> et <code>isLiked</code>, et un bouton qui bascule entre les deux.</p>
+      <div class="code" data-lang="jsx" data-file="src/components/MovieCard.jsx"><script type="text/plain">
+// src/components/MovieCard.jsx
+import { useState } from 'react';
+
+function MovieCard({ title, year, rating, poster }) {
+  // State pour gérer les likes
+  const [likes, setLikes] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
+
+  const handleLike = () => {
+    if (isLiked) {
+      setLikes(likes - 1);
+      setIsLiked(false);
+    } else {
+      setLikes(likes + 1);
+      setIsLiked(true);
+    }
+  };
+
+  return (
+    <div className="col-md-3 mb-4">
+      <div className="card h-100">
+        <img
+          src={poster}
+          className="card-img-top"
+          alt={title}
+          style={{ height: '400px', objectFit: 'cover' }}
+        />
+        <div className="card-body">
+          <h5 className="card-title">{title}</h5>
+          <p className="card-text">
+            <span className="badge bg-primary">{year}</span>
+            <span className="badge bg-warning ms-2">⭐ {rating}/10</span>
+          </p>
+          <button
+            className={`btn btn-sm ${isLiked ? 'btn-danger' : 'btn-outline-danger'}`}
+            onClick={handleLike}
+          >
+            {isLiked ? '❤️' : '🤍'} {likes} likes
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default MovieCard;
+</script></div>
+      <p class="muted"><strong>Résultat attendu :</strong> le compteur monte et descend, l'icône change, et chaque carte garde son propre state.</p>
+    </article>
+
+    <article class="tile s2 t-blue">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-book"/></svg></span><div><p class="eyebrow">Théorie</p><h3 class="section-title">Le rendu conditionnel</h3></div><span class="ftag f2">Rendu</span></div>
+      <p>Afficher un élément selon une condition, par exemple « Aucun résultat » quand la liste est vide. Trois écritures possibles :</p>
+      <div class="code" data-lang="jsx" data-file="Exemple"><script type="text/plain">
+// 1. If/Else classique
+function Message({ isLoggedIn }) {
+  if (isLoggedIn) {
+    return <p>Bienvenue !</p>;
+  } else {
+    return <p>Connectez-vous</p>;
+  }
+}
+
+// 2. Ternaire (plus compact)
+function Message({ isLoggedIn }) {
+  return (
+    <p>{isLoggedIn ? 'Bienvenue !' : 'Connectez-vous'}</p>
+  );
+}
+
+// 3. && (afficher OU rien)
+function Message({ hasNotification }) {
+  return (
+    <div>
+      {hasNotification && <span>🔔 Nouvelle notification</span>}
+    </div>
+  );
+}
+</script></div>
+    </article>
+
+    <article class="tile s2">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">Une liste de films conditionnelle</h3></div><span class="ftag f2">Rendu</span></div>
+      <p>Crée <code>src/components/MovieList.jsx</code>, puis passe un tableau de films depuis <code>App.jsx</code>.</p>
+      <div class="code" data-lang="jsx" data-file="src/components/MovieList.jsx"><script type="text/plain">
+// src/components/MovieList.jsx
+import MovieCard from './MovieCard';
+
+function MovieList({ movies }) {
+  // Conditional rendering : si pas de films
+  if (movies.length === 0) {
+    return (
+      <div className="alert alert-warning">
+        <p className="mb-0">Aucun film trouvé. 😢</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h2 className="mb-4">
+        {movies.length} film{movies.length > 1 ? 's' : ''} trouvé{movies.length > 1 ? 's' : ''}
+      </h2>
+      <div className="row">
+        {movies.map(movie => (
+          <MovieCard
+            key={movie.id}
+            id={movie.id}
+            title={movie.title}
+            year={movie.year}
+            rating={movie.rating}
+            poster={movie.poster}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default MovieList;
+</script></div>
+      <div class="code" data-lang="jsx" data-file="src/App.jsx"><script type="text/plain">
+// src/App.jsx
+import { useState } from 'react';
+import MovieList from './components/MovieList';
+
+function App() {
+  const [movies] = useState([
+    {
+      id: 1,
+      title: "Inception",
+      year: 2010,
+      rating: 8.8,
+      poster: "https://image.tmdb.org/t/p/w500/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg"
+    },
+    {
+      id: 2,
+      title: "Interstellar",
+      year: 2014,
+      rating: 8.6,
+      poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg"
+    },
+    {
+      id: 3,
+      title: "The Dark Knight",
+      year: 2008,
+      rating: 9.0,
+      poster: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg"
+    }
+  ]);
+
+  return (
+    <div className="container mt-5">
+      <h1 className="mb-4">🎬 Films Populaires</h1>
+      <MovieList movies={movies} />
+    </div>
+  );
+}
+
+export default App;
+</script></div>
+      <p class="muted"><strong>Test :</strong> remplace le tableau par <code>[]</code>, le message « Aucun film trouvé » apparaît.</p>
+    </article>
+
+    <article class="tile s2 t-lilac">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-layers"/></svg></span><div><p class="eyebrow">À retenir</p><h3 class="section-title">Listes et keys</h3></div><span class="ftag f2">Listes</span></div>
+      <p>Avec <code>.map()</code>, chaque élément a besoin d'une prop <code>key</code> unique. React s'en sert pour savoir quel élément a changé, été ajouté ou supprimé : meilleures performances, moins de bugs étranges.</p>
+      <div class="code" data-lang="jsx" data-file="Exemple"><script type="text/plain">
+// ❌ MAUVAIS : pas de key
+{movies.map(movie => <MovieCard title={movie.title} />)}
+
+// ✅ BON : key unique
+{movies.map(movie => <MovieCard key={movie.id} title={movie.title} />)}
+
+// ⚠️ À ÉVITER : index comme key (sauf si la liste ne change jamais)
+{movies.map((movie, index) => <MovieCard key={index} title={movie.title} />)}
+</script></div>
+    </article>
+
+    <article class="tile s2 t-lilac">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-table"/></svg></span><div><p class="eyebrow">Récapitulatif</p><h3 class="section-title">Les fondamentaux</h3></div></div>
+      <div class="tbl"><table>
+        <thead><tr><th>Concept</th><th>Rôle</th><th>Exemple</th></tr></thead>
+        <tbody>
+          <tr><td>Composants</td><td>Briques réutilisables de l'interface</td><td><code>&lt;MovieCard /&gt;</code></td></tr>
+          <tr><td>Props</td><td>Données passées au composant, en lecture seule</td><td><code>&lt;MovieCard title="Inception" /&gt;</code></td></tr>
+          <tr><td>State</td><td>Données internes et modifiables</td><td><code>useState(0)</code></td></tr>
+          <tr><td>Rendu conditionnel</td><td>Afficher selon une condition</td><td><code>{isLoggedIn &amp;&amp; &lt;Dashboard /&gt;}</code></td></tr>
+          <tr><td>Listes</td><td>Afficher plusieurs éléments</td><td><code>movies.map(m =&gt; &lt;Card key={m.id} /&gt;)</code></td></tr>
+        </tbody>
+      </table></div>
+    </article>
+
+    <article class="tile s4 t-mint">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-check"/></svg></span><div><p class="eyebrow">Point de vérification</p><h3 class="section-title">Prêt pour la suite ?</h3></div></div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="c-base-1" data-check><span>Le composant <code>Welcome</code> s'affiche</span></label>
+        <label class="check"><input type="checkbox" id="c-base-2" data-check><span>Trois cartes de films affichées</span></label>
+        <label class="check"><input type="checkbox" id="c-base-3" data-check><span>Les likes fonctionnent, carte par carte</span></label>
+        <label class="check"><input type="checkbox" id="c-base-4" data-check><span>Le message « 3 films trouvés » s'affiche</span></label>
+        <label class="check"><input type="checkbox" id="c-base-5" data-check><span>Avec <code>[]</code>, le message d'absence apparaît</span></label>
+        <label class="check"><input type="checkbox" id="c-base-6" data-check><span>Aucune erreur dans la console</span></label>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ USEEFFECT & API ============ -->
+<section class="panel" id="api" role="tabpanel" aria-labelledby="tab-api" hidden>
+  <div class="sec-intro"><h2>useEffect et appels API</h2><span class="muted">On remplace les données en dur par de vrais films venus de TMDB.</span></div>
+  <div class="grid">
+    <article class="tile s2 t-blue">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-book"/></svg></span><div><p class="eyebrow">Théorie</p><h3 class="section-title">Le hook useEffect</h3></div><span class="ftag f3">Effets</span></div>
+      <p><code>useEffect</code> exécute du code à des moments précis du cycle de vie d'un composant : appels API, timers, abonnements.</p>
+      <div class="code" data-lang="jsx" data-file="Exemple"><script type="text/plain">
+import { useEffect } from 'react';
+
+useEffect(() => {
+  // Code à exécuter
+  console.log('Composant monté ou mis à jour');
+
+  // Fonction de nettoyage (optionnelle)
+  return () => {
+    console.log('Nettoyage');
+  };
+}, [dependencies]);
+</script></div>
+    </article>
+
+    <article class="tile s2 t-lilac">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-table"/></svg></span><div><p class="eyebrow">Référence</p><h3 class="section-title">Le tableau de dépendances</h3></div><span class="ftag f3">Effets</span></div>
+      <p>Il contrôle <strong>quand</strong> l'effet s'exécute.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>Dépendances</th><th>Exécution</th><th>Exemple</th></tr></thead>
+        <tbody>
+          <tr><td><code>[]</code></td><td>Une seule fois, au montage</td><td><code>useEffect(() =&gt; {}, [])</code></td></tr>
+          <tr><td><code>[count]</code></td><td>Au montage, puis à chaque changement de <code>count</code></td><td><code>useEffect(() =&gt; {}, [count])</code></td></tr>
+          <tr><td>Aucun tableau</td><td>À chaque rendu (à éviter)</td><td><code>useEffect(() =&gt; {})</code></td></tr>
+        </tbody>
+      </table></div>
+    </article>
+
+    <article class="tile s4">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">Premier useEffect : un chargement simulé</h3></div><span class="ftag f3">Effets</span></div>
+      <p>Un <code>setTimeout</code> de 2 secondes simule l'arrivée des données. Pendant ce temps, un spinner Bootstrap s'affiche.</p>
+      <div class="code" data-lang="jsx" data-file="src/App.jsx"><script type="text/plain">
+// src/App.jsx
+import { useState, useEffect } from 'react';
+import MovieList from './components/MovieList';
+
+function App() {
+  const [movies, setMovies] = useState([]);
+
+  useEffect(() => {
+    console.log('🎬 Composant monté ! On va charger les films...');
+
+    // Pour l'instant, on simule un chargement
+    setTimeout(() => {
+      setMovies([
+        {
+          id: 1,
+          title: "Inception",
+          year: 2010,
+          rating: 8.8,
+          poster: "https://image.tmdb.org/t/p/w500/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg"
+        }
+      ]);
+    }, 2000);
+  }, []); // [] = une seule fois au montage
+
+  return (
+    <div className="container mt-5">
+      <h1 className="mb-4">🎬 Films Populaires</h1>
+      {movies.length === 0 ? (
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Chargement...</span>
+          </div>
+        </div>
+      ) : (
+        <MovieList movies={movies} />
+      )}
+    </div>
+  );
+}
+
+export default App;
+</script></div>
+      <p class="muted"><strong>Résultat attendu :</strong> spinner pendant 2 s, puis la carte. Dans la console, le message apparaît une seule fois (deux fois en développement à cause de <code>StrictMode</code>, c'est normal).</p>
+    </article>
+
+    <article class="tile s2 t-blue">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-globe"/></svg></span><div><p class="eyebrow">Théorie</p><h3 class="section-title">Appeler une API avec fetch</h3></div><span class="ftag f3">API</span></div>
+      <p><code>fetch</code> est la fonction native de JavaScript pour les requêtes HTTP. Deux écritures : les promesses chaînées, ou <code>async/await</code>, plus lisible.</p>
+      <div class="code" data-lang="javascript" data-file="Exemple"><script type="text/plain">
+// Promesses chaînées
+fetch('https://api.example.com/data')
+  .then(response => response.json())  // Convertir en JSON
+  .then(data => console.log(data))    // Utiliser les données
+  .catch(error => console.error(error)); // Gérer les erreurs
+
+// async / await
+async function fetchData() {
+  try {
+    const response = await fetch('https://api.example.com/data');
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error('Erreur:', error);
+  }
+}
+</script></div>
+    </article>
+
+    <article class="tile s2 t-peach">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-layers"/></svg></span><div><p class="eyebrow">Bonne pratique</p><h3 class="section-title">Isoler les appels dans un service</h3></div></div>
+      <p>On regroupe tous les appels TMDB dans <code>src/services/tmdbApi.js</code>. Les composants appellent des fonctions claires (<code>getPopularMovies()</code>, <code>searchMovies()</code>…) sans connaître les URL.</p>
+      <p>Chaque fonction <strong>transforme</strong> la réponse brute de l'API en un format uniforme : <code>id</code>, <code>title</code>, <code>year</code>, <code>rating</code>, <code>poster</code>, <code>overview</code>. Nos composants restent identiques, que les données viennent de la liste populaire, d'une recherche ou d'un genre.</p>
+      <blockquote class="sarah"><span class="av">S</span><p><b>Sarah</b>Si TMDB change un jour son format, on ne corrige qu'un seul fichier.</p></blockquote>
+    </article>
+
+    <article class="tile s4">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">Le service API TMDB</h3></div><span class="ftag f3">API</span></div>
+      <p>Cinq fonctions : films populaires, recherche, détails d'un film (avec le casting), liste des genres, films par genre.</p>
+      <div class="code" data-lang="javascript" data-file="src/services/tmdbApi.js"><script type="text/plain">
+// src/services/tmdbApi.js
+
+const API_KEY = '08a341931ab5f5dcee467baeb4a68c76';
+const BASE_URL = 'https://api.themoviedb.org/3';
+const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
+
+// Récupérer les films populaires
+export async function getPopularMovies() {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/movie/popular?api_key=${API_KEY}&language=fr-FR&page=1`
+    );
+    const data = await response.json();
+
+    // Transformer les données pour notre format
+    return data.results.map(movie => ({
+      id: movie.id,
+      title: movie.title,
+      year: new Date(movie.release_date).getFullYear(),
+      rating: movie.vote_average.toFixed(1),
+      poster: `${IMAGE_BASE_URL}${movie.poster_path}`,
+      overview: movie.overview
+    }));
+  } catch (error) {
+    console.error('Erreur lors de la récupération des films:', error);
+    return [];
+  }
+}
+
+// Rechercher des films
+export async function searchMovies(query) {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/search/movie?api_key=${API_KEY}&language=fr-FR&query=${encodeURIComponent(query)}`
+    );
+    const data = await response.json();
+
+    return data.results.map(movie => ({
+      id: movie.id,
+      title: movie.title,
+      year: movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A',
+      rating: movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A',
+      poster: movie.poster_path ? `${IMAGE_BASE_URL}${movie.poster_path}` : 'https://placehold.co/500x750?text=No+Image',
+      overview: movie.overview
+    }));
+  } catch (error) {
+    console.error('Erreur lors de la recherche:', error);
+    return [];
+  }
+}
+
+// Récupérer les détails d'un film
+export async function getMovieDetails(movieId) {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=fr-FR&append_to_response=credits`
+    );
+    const movie = await response.json();
+
+    return {
+      id: movie.id,
+      title: movie.title,
+      year: new Date(movie.release_date).getFullYear(),
+      rating: movie.vote_average.toFixed(1),
+      poster: `${IMAGE_BASE_URL}${movie.poster_path}`,
+      backdrop: movie.backdrop_path ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` : null,
+      overview: movie.overview,
+      genres: movie.genres.map(g => g.name),
+      runtime: movie.runtime,
+      cast: movie.credits.cast.slice(0, 10).map(actor => ({
+        id: actor.id,
+        name: actor.name,
+        character: actor.character,
+        photo: actor.profile_path ? `${IMAGE_BASE_URL}${actor.profile_path}` : 'https://placehold.co/200x300?text=No+Photo'
+      }))
+    };
+  } catch (error) {
+    console.error('Erreur lors de la récupération des détails:', error);
+    return null;
+  }
+}
+
+// Récupérer les genres
+export async function getGenres() {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/genre/movie/list?api_key=${API_KEY}&language=fr-FR`
+    );
+    const data = await response.json();
+    return data.genres;
+  } catch (error) {
+    console.error('Erreur lors de la récupération des genres:', error);
+    return [];
+  }
+}
+
+// Récupérer des films par genre
+export async function getMoviesByGenre(genreId) {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/discover/movie?api_key=${API_KEY}&language=fr-FR&with_genres=${genreId}&sort_by=popularity.desc`
+    );
+    const data = await response.json();
+
+    return data.results.map(movie => ({
+      id: movie.id,
+      title: movie.title,
+      year: new Date(movie.release_date).getFullYear(),
+      rating: movie.vote_average.toFixed(1),
+      poster: `${IMAGE_BASE_URL}${movie.poster_path}`,
+      overview: movie.overview
+    }));
+  } catch (error) {
+    console.error('Erreur lors de la récupération des films par genre:', error);
+    return [];
+  }
+}
+</script></div>
+    </article>
+
+    <article class="tile s4">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">Afficher les vrais films populaires</h3></div><span class="ftag f3">API</span></div>
+      <p>Trois états pilotent l'affichage : <code>movies</code>, <code>loading</code> et <code>error</code>.</p>
+      <div class="code" data-lang="jsx" data-file="src/App.jsx"><script type="text/plain">
+// src/App.jsx
+import { useState, useEffect } from 'react';
+import MovieList from './components/MovieList';
+import { getPopularMovies } from './services/tmdbApi';
+
+function App() {
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Fonction asynchrone pour charger les films
+    async function loadMovies() {
+      try {
+        setLoading(true);
+        const popularMovies = await getPopularMovies();
+        setMovies(popularMovies);
+        setError(null);
+      } catch (err) {
+        setError('Impossible de charger les films');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadMovies();
+  }, []); // Chargement unique au montage
+
+  return (
+    <div className="container mt-5">
+      <h1 className="mb-4">🎬 Films Populaires</h1>
+
+      {loading && (
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Chargement...</span>
+          </div>
+          <p className="mt-3">Chargement des films...</p>
+        </div>
+      )}
+
+      {error && (
+        <div className="alert alert-danger">{error}</div>
+      )}
+
+      {!loading && !error && <MovieList movies={movies} />}
+    </div>
+  );
+}
+
+export default App;
+</script></div>
+      <p class="muted"><strong>En cas d'erreur, vérifie :</strong> ta connexion internet, la clé API dans <code>tmdbApi.js</code>, et les messages de la console.</p>
+    </article>
+
+    <article class="tile s2">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-search"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">Le composant SearchBar</h3></div><span class="ftag f3">API</span></div>
+      <p>Un composant d'affichage pur : la valeur et le gestionnaire de changement viennent du parent, via les props.</p>
+      <div class="code" data-lang="jsx" data-file="src/components/SearchBar.jsx"><script type="text/plain">
+// src/components/SearchBar.jsx
+function SearchBar({ searchTerm, onSearchChange }) {
+  return (
+    <div className="mb-4">
+      <div className="input-group input-group-lg">
+        <span className="input-group-text">🔍</span>
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Rechercher un film..."
+          value={searchTerm}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
+      </div>
+    </div>
+  );
+}
+
+export default SearchBar;
+</script></div>
+    </article>
+
+    <article class="tile s2 t-peach">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-bolt"/></svg></span><div><p class="eyebrow">Notion clé</p><h3 class="section-title">Le debounce</h3></div><span class="ftag f3">Effets</span></div>
+      <p>Sans précaution, taper « Matrix » enverrait une requête à chaque lettre. Le <strong>debounce</strong> attend 500 ms de silence avant de lancer la recherche.</p>
+      <ol>
+        <li>À chaque frappe, <code>searchTerm</code> change et l'effet se relance.</li>
+        <li>L'effet programme la recherche dans 500 ms avec <code>setTimeout</code>.</li>
+        <li>Si une nouvelle frappe arrive avant, la fonction de nettoyage annule le timer précédent avec <code>clearTimeout</code>.</li>
+        <li>Seule la dernière frappe déclenche vraiment l'appel API.</li>
+      </ol>
+    </article>
+
+    <article class="tile s4">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">Recherche en temps réel dans App</h3></div><span class="ftag f3">Effets</span></div>
+      <p>Deux <code>useEffect</code> séparés : un pour le chargement initial, un pour la recherche qui dépend de <code>searchTerm</code>.</p>
+      <div class="code" data-lang="jsx" data-file="src/App.jsx"><script type="text/plain">
+// src/App.jsx
+import { useState, useEffect } from 'react';
+import MovieList from './components/MovieList';
+import SearchBar from './components/SearchBar';
+import { getPopularMovies, searchMovies } from './services/tmdbApi';
+
+function App() {
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Effet pour charger les films populaires au démarrage
+  useEffect(() => {
+    async function loadMovies() {
+      try {
+        setLoading(true);
+        const popularMovies = await getPopularMovies();
+        setMovies(popularMovies);
+        setError(null);
+      } catch (err) {
+        setError('Impossible de charger les films');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadMovies();
+  }, []);
+
+  // Effet pour la recherche (se déclenche quand searchTerm change)
+  useEffect(() => {
+    // Si le champ est vide, on ne fait rien
+    if (searchTerm.trim() === '') {
+      return;
+    }
+
+    // Debounce : attendre 500ms avant de lancer la recherche
+    const timeoutId = setTimeout(async () => {
+      try {
+        setLoading(true);
+        const results = await searchMovies(searchTerm);
+        setMovies(results);
+        setError(null);
+      } catch (err) {
+        setError('Erreur lors de la recherche');
+      } finally {
+        setLoading(false);
+      }
+    }, 500);
+
+    // Nettoyage : annuler le timeout si searchTerm change avant les 500ms
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]); // Dépendance : se déclenche à chaque changement de searchTerm
+
+  // Fonction pour réinitialiser et charger les films populaires
+  const handleSearchChange = async (value) => {
+    setSearchTerm(value);
+
+    // Si on vide le champ, recharger les films populaires
+    if (value.trim() === '') {
+      try {
+        setLoading(true);
+        const popularMovies = await getPopularMovies();
+        setMovies(popularMovies);
+      } catch (err) {
+        setError('Impossible de charger les films');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  return (
+    <div className="container mt-5">
+      <h1 className="mb-4">🎬 StreamTech</h1>
+
+      <SearchBar
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+      />
+
+      {loading && (
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Chargement...</span>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div className="alert alert-danger">{error}</div>
+      )}
+
+      {!loading && !error && (
+        <>
+          <p className="text-muted">
+            {searchTerm ? `Résultats pour "${searchTerm}"` : 'Films populaires'}
+          </p>
+          <MovieList movies={movies} />
+        </>
+      )}
+    </div>
+  );
+}
+
+export default App;
+</script></div>
+    </article>
+
+    <article class="tile s2 t-blue">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-book"/></svg></span><div><p class="eyebrow">Approfondir</p><h3 class="section-title">Le nettoyage (cleanup)</h3></div><span class="ftag f3">Effets</span></div>
+      <p>Le <code>return</code> d'un effet nettoie quand le composant se démonte, ou juste avant la prochaine exécution de l'effet.</p>
+      <div class="code" data-lang="jsx" data-file="Exemple"><script type="text/plain">
+useEffect(() => {
+  const timer = setTimeout(() => {
+    console.log('3 secondes écoulées');
+  }, 3000);
+
+  // Nettoyage : annule le timer si le composant se démonte
+  return () => clearTimeout(timer);
+}, []);
+</script></div>
+    </article>
+
+    <article class="tile s2 t-blue">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-book"/></svg></span><div><p class="eyebrow">Approfondir</p><h3 class="section-title">Plusieurs useEffect</h3></div><span class="ftag f3">Effets</span></div>
+      <p>Un composant peut avoir plusieurs effets. C'est même recommandé : une responsabilité par effet.</p>
+      <div class="code" data-lang="jsx" data-file="Exemple"><script type="text/plain">
+// Effet 1 : charger les données
+useEffect(() => {
+  fetchData();
+}, []);
+
+// Effet 2 : écouter le scroll
+useEffect(() => {
+  window.addEventListener('scroll', handleScroll);
+  return () => window.removeEventListener('scroll', handleScroll);
+}, []);
+</script></div>
+    </article>
+
+    <article class="tile s4 t-rose">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-alert"/></svg></span><div><p class="eyebrow">Règle d'or</p><h3 class="section-title">Déclarer toutes les dépendances</h3></div></div>
+      <p>Toute variable du composant utilisée dans l'effet doit figurer dans le tableau de dépendances. Sinon, l'effet travaille avec une valeur périmée.</p>
+      <div class="code" data-lang="jsx" data-file="Exemple"><script type="text/plain">
+// ❌ MAUVAIS : count est utilisé mais pas dans les dépendances
+useEffect(() => {
+  console.log(count);
+}, []);
+
+// ✅ BON
+useEffect(() => {
+  console.log(count);
+}, [count]);
+</script></div>
+    </article>
+
+    <article class="tile s2 t-lilac">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-table"/></svg></span><div><p class="eyebrow">Récapitulatif</p><h3 class="section-title">Effets et API</h3></div></div>
+      <div class="tbl"><table>
+        <thead><tr><th>Concept</th><th>Utilisation</th></tr></thead>
+        <tbody>
+          <tr><td>useEffect</td><td>Exécuter du code à certains moments : appels API, timers, listeners</td></tr>
+          <tr><td>Dépendances</td><td><code>[]</code> une fois, <code>[count]</code> quand count change</td></tr>
+          <tr><td>Cleanup</td><td>Annuler timers et abonnements avant démontage</td></tr>
+          <tr><td>fetch + async/await</td><td>Récupérer des données : <code>await fetch(url)</code></td></tr>
+          <tr><td>Debounce</td><td>Limiter la fréquence d'exécution d'une recherche</td></tr>
+        </tbody>
+      </table></div>
+    </article>
+
+    <article class="tile s2 t-mint">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-check"/></svg></span><div><p class="eyebrow">Point de vérification</p><h3 class="section-title">Tout fonctionne ?</h3></div></div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="c-api-1" data-check><span>Le spinner simulé s'affiche 2 s</span></label>
+        <label class="check"><input type="checkbox" id="c-api-2" data-check><span>Les films populaires TMDB s'affichent</span></label>
+        <label class="check"><input type="checkbox" id="c-api-3" data-check><span>La recherche « Inception » fonctionne</span></label>
+        <label class="check"><input type="checkbox" id="c-api-4" data-check><span>Pas de requête immédiate (debounce)</span></label>
+        <label class="check"><input type="checkbox" id="c-api-5" data-check><span>Vider le champ réaffiche les populaires</span></label>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ ROUTER ============ -->
+<section class="panel" id="router" role="tabpanel" aria-labelledby="tab-router" hidden>
+  <div class="sec-intro"><h2>React Router et navigation</h2><span class="muted">L'app devient multi-pages, sans aucun rechargement.</span></div>
+  <div class="grid">
+    <article class="tile s4 t-blue">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-route"/></svg></span><div><p class="eyebrow">Théorie</p><h3 class="section-title">Une SPA avec React Router v6</h3></div><span class="ftag f4">Navigation</span></div>
+      <p>Une <strong>Single Page Application</strong> affiche plusieurs « pages » sans recharger : l'URL change, mais on reste sur la même page HTML.</p>
+      <div class="code" data-lang="jsx" data-file="Exemple"><script type="text/plain">
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+
+// BrowserRouter : enveloppe toute l'app
+<BrowserRouter>
+  {/* Routes : conteneur des routes */}
+  <Routes>
+    {/* Route : une page */}
+    <Route path="/" element={<Home />} />
+    <Route path="/about" element={<About />} />
+    <Route path="/movies/:id" element={<MovieDetails />} />
+  </Routes>
+</BrowserRouter>
+
+// Link : pour naviguer (comme <a> mais sans rechargement)
+<Link to="/about">À propos</Link>
+</script></div>
+      <ul>
+        <li><code>path</code> : l'URL de la route · <code>element</code> : le composant affiché</li>
+        <li><code>:id</code> : paramètre dynamique, récupérable avec <code>useParams</code></li>
+        <li><code>Link</code> remplace <code>&lt;a&gt;</code> pour ne pas recharger la page</li>
+      </ul>
+    </article>
+
+    <article class="tile s4">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">La page d'accueil : Home.jsx</h3></div><span class="ftag f4">Navigation</span></div>
+      <p>La logique de <code>App.jsx</code> déménage dans <code>src/pages/Home.jsx</code>, avec un nouveau filtre par genre. Note <code>Promise.all</code> pour charger films et genres en parallèle.</p>
+      <div class="code" data-lang="jsx" data-file="src/pages/Home.jsx"><script type="text/plain">
+// src/pages/Home.jsx
+import { useState, useEffect } from 'react';
+import MovieList from '../components/MovieList';
+import SearchBar from '../components/SearchBar';
+import { getPopularMovies, searchMovies, getGenres, getMoviesByGenre } from '../services/tmdbApi';
+
+function Home() {
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [genres, setGenres] = useState([]);
+  const [selectedGenre, setSelectedGenre] = useState('');
+
+  // Charger les films populaires et les genres au démarrage
+  useEffect(() => {
+    async function loadInitialData() {
+      try {
+        setLoading(true);
+        const [popularMovies, genresList] = await Promise.all([
+          getPopularMovies(),
+          getGenres()
+        ]);
+        setMovies(popularMovies);
+        setGenres(genresList);
+        setError(null);
+      } catch (err) {
+        setError('Impossible de charger les données');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadInitialData();
+  }, []);
+
+  // Recherche avec debounce
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        setLoading(true);
+        const results = await searchMovies(searchTerm);
+        setMovies(results);
+        setSelectedGenre(''); // Réinitialiser le genre sélectionné
+        setError(null);
+      } catch (err) {
+        setError('Erreur lors de la recherche');
+      } finally {
+        setLoading(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  // Filtrer par genre
+  useEffect(() => {
+    if (!selectedGenre) return;
+
+    async function loadMoviesByGenre() {
+      try {
+        setLoading(true);
+        const results = await getMoviesByGenre(selectedGenre);
+        setMovies(results);
+        setSearchTerm(''); // Réinitialiser la recherche
+        setError(null);
+      } catch (err) {
+        setError('Erreur lors du filtrage');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadMoviesByGenre();
+  }, [selectedGenre]);
+
+  const handleSearchChange = async (value) => {
+    setSearchTerm(value);
+
+    if (value.trim() === '') {
+      try {
+        setLoading(true);
+        const popularMovies = await getPopularMovies();
+        setMovies(popularMovies);
+        setSelectedGenre('');
+      } catch (err) {
+        setError('Impossible de charger les films');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleGenreChange = (e) => {
+    setSelectedGenre(e.target.value);
+  };
+
+  const resetFilters = async () => {
+    setSearchTerm('');
+    setSelectedGenre('');
+    try {
+      setLoading(true);
+      const popularMovies = await getPopularMovies();
+      setMovies(popularMovies);
+    } catch (err) {
+      setError('Impossible de charger les films');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <h1 className="mb-4">🎬 Films Populaires</h1>
+
+      <SearchBar
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+      />
+
+      {/* Filtre par genre */}
+      <div className="mb-4 d-flex gap-2">
+        <select
+          className="form-select"
+          value={selectedGenre}
+          onChange={handleGenreChange}
+          style={{ maxWidth: '300px' }}
+        >
+          <option value="">Tous les genres</option>
+          {genres.map(genre => (
+            <option key={genre.id} value={genre.id}>
+              {genre.name}
+            </option>
+          ))}
+        </select>
+
+        {(searchTerm || selectedGenre) && (
+          <button
+            className="btn btn-outline-secondary"
+            onClick={resetFilters}
+          >
+            Réinitialiser
+          </button>
+        )}
+      </div>
+
+      {loading && (
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Chargement...</span>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div className="alert alert-danger">{error}</div>
+      )}
+
+      {!loading && !error && (
+        <>
+          <p className="text-muted">
+            {searchTerm && `Résultats pour "${searchTerm}"`}
+            {selectedGenre && `Films du genre : ${genres.find(g => g.id === parseInt(selectedGenre))?.name}`}
+            {!searchTerm && !selectedGenre && 'Films populaires'}
+          </p>
+          <MovieList movies={movies} />
+        </>
+      )}
+    </div>
+  );
+}
+
+export default Home;
+</script></div>
+    </article>
+
+    <article class="tile s4">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">La page de détails : MovieDetails.jsx</h3></div><span class="ftag f4">Navigation</span></div>
+      <p><code>useParams</code> lit l'identifiant dans l'URL, <code>useNavigate</code> gère le bouton retour. L'effet dépend de <code>[id]</code> : il se relance si on passe d'un film à l'autre.</p>
+      <div class="code" data-lang="jsx" data-file="src/pages/MovieDetails.jsx"><script type="text/plain">
+// src/pages/MovieDetails.jsx
+import { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { getMovieDetails } from '../services/tmdbApi';
+
+function MovieDetails() {
+  const { id } = useParams(); // Récupérer l'ID depuis l'URL
+  const navigate = useNavigate(); // Pour la navigation programmatique
+  const [movie, setMovie] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function loadMovieDetails() {
+      try {
+        setLoading(true);
+        const details = await getMovieDetails(id);
+        setMovie(details);
+        setError(null);
+      } catch {
+        setError('Impossible de charger les détails du film');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadMovieDetails();
+  }, [id]); // Recharger si l'ID change
+
+  if (loading) {
+    return (
+      <div className="text-center mt-5">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Chargement...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !movie) {
+    return (
+      <div className="container mt-5">
+        <div className="alert alert-danger">{error || 'Film introuvable'}</div>
+        <Link to="/" className="btn btn-primary">Retour à l'accueil</Link>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {/* Bannière avec image de fond */}
+      {movie.backdrop && (
+        <div
+          style={{
+            backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url(${movie.backdrop})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            padding: '100px 0',
+            marginBottom: '30px'
+          }}
+        >
+          <div className="container">
+            <button
+              className="btn btn-outline-light mb-3"
+              onClick={() => navigate(-1)}
+            >
+              ← Retour
+            </button>
+            <h1 className="text-white display-4">{movie.title}</h1>
+            <p className="text-white fs-5">{movie.year}</p>
+          </div>
+        </div>
+      )}
+
+      <div className="container">
+        <div className="row">
+          {/* Colonne gauche : Poster */}
+          <div className="col-md-4">
+            <img
+              src={movie.poster}
+              alt={movie.title}
+              className="img-fluid rounded shadow-lg"
+            />
+
+            <div className="card mt-3">
+              <div className="card-body">
+                <h5 className="card-title">Informations</h5>
+                <p className="mb-1"><strong>Note :</strong> ⭐ {movie.rating}/10</p>
+                <p className="mb-1"><strong>Durée :</strong> {movie.runtime} min</p>
+                <p className="mb-1">
+                  <strong>Genres :</strong>
+                  {movie.genres.map((genre, index) => (
+                    <span key={index} className="badge bg-secondary ms-1">
+                      {genre}
+                    </span>
+                  ))}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Colonne droite : Détails */}
+          <div className="col-md-8">
+            <h2 className="mb-3">Synopsis</h2>
+            <p className="lead">{movie.overview}</p>
+
+            <hr className="my-4" />
+
+            <h3 className="mb-3">Distribution</h3>
+            <div className="row">
+              {movie.cast.map(actor => (
+                <div key={actor.id} className="col-md-3 col-6 mb-3">
+                  <div className="card">
+                    <img
+                      src={actor.photo}
+                      className="card-img-top"
+                      alt={actor.name}
+                      style={{ height: '250px', objectFit: 'cover' }}
+                    />
+                    <div className="card-body p-2">
+                      <p className="card-text small mb-0">
+                        <strong>{actor.name}</strong>
+                      </p>
+                      <p className="card-text small text-muted">{actor.character}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default MovieDetails;
+</script></div>
+    </article>
+
+    <article class="tile s4">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">La barre de navigation</h3></div><span class="ftag f4">Navigation</span></div>
+      <p>Crée <code>src/components/Navbar.jsx</code> avec trois liens : Films, Todos, Contact.</p>
+      <div class="code" data-lang="jsx" data-file="src/components/Navbar.jsx"><script type="text/plain">
+// src/components/Navbar.jsx
+import { Link, NavLink } from 'react-router-dom';
+
+function Navbar() {
+  return (
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+      <div className="container">
+        <Link className="navbar-brand" to="/">
+          🎬 StreamTech
+        </Link>
+
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <ul className="navbar-nav ms-auto">
+            <li className="nav-item">
+              <NavLink
+                className={({ isActive }) =>
+                  isActive ? 'nav-link active' : 'nav-link'
+                }
+                to="/"
+              >
+                Films
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink
+                className={({ isActive }) =>
+                  isActive ? 'nav-link active' : 'nav-link'
+                }
+                to="/todos"
+              >
+                Todos
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink
+                className={({ isActive }) =>
+                  isActive ? 'nav-link active' : 'nav-link'
+                }
+                to="/contact"
+              >
+                Contact
+              </NavLink>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+export default Navbar;
+</script></div>
+    </article>
+
+    <article class="tile s2 t-blue">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-book"/></svg></span><div><p class="eyebrow">À retenir</p><h3 class="section-title">Link ou NavLink ?</h3></div><span class="ftag f4">Navigation</span></div>
+      <div class="dodont">
+        <div class="dd"><code>Link</code> : un lien simple, sans rechargement de page.</div>
+        <div class="dd"><code>NavLink</code> : un lien qui sait s'il est actif et reçoit automatiquement la classe <code>active</code>. Idéal pour un menu.</div>
+      </div>
+    </article>
+
+    <article class="tile s2 t-peach">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-alert"/></svg></span><div><p class="eyebrow">Astuce</p><h3 class="section-title">Le menu mobile reste fermé ?</h3></div></div>
+      <p>Le bouton burger de la navbar utilise le JavaScript de Bootstrap. Si le menu ne s'ouvre pas sur mobile, ajoute cet import dans <code>main.jsx</code>, juste sous l'import du CSS :</p>
+      <div class="code" data-lang="jsx" data-file="src/main.jsx"><script type="text/plain">
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+</script></div>
+    </article>
+
+    <article class="tile s2">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">Des cartes cliquables</h3></div><span class="ftag f4">Navigation</span></div>
+      <p>La carte devient un <code>Link</code> vers <code>/movie/:id</code>. Dans <code>handleLike</code>, <code>e.preventDefault()</code> empêche le clic sur « like » de déclencher la navigation.</p>
+      <div class="code" data-lang="jsx" data-file="src/components/MovieCard.jsx"><script type="text/plain">
+// src/components/MovieCard.jsx
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+
+function MovieCard({ id, title, year, rating, poster }) {
+  const [likes, setLikes] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
+
+  const handleLike = (e) => {
+    e.preventDefault(); // Empêcher la navigation lors du clic
+    if (isLiked) {
+      setLikes(likes - 1);
+      setIsLiked(false);
+    } else {
+      setLikes(likes + 1);
+      setIsLiked(true);
+    }
+  };
+
+  return (
+    <div className="col-md-3 mb-4">
+      <Link to={`/movie/${id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <div className="card h-100 hover-card">
+          <img
+            src={poster}
+            className="card-img-top"
+            alt={title}
+            style={{ height: '400px', objectFit: 'cover' }}
+          />
+          <div className="card-body">
+            <h5 className="card-title">{title}</h5>
+            <p className="card-text">
+              <span className="badge bg-primary">{year}</span>
+              <span className="badge bg-warning ms-2">⭐ {rating}/10</span>
+            </p>
+            <button
+              className={`btn btn-sm ${isLiked ? 'btn-danger' : 'btn-outline-danger'}`}
+              onClick={handleLike}
+            >
+              {isLiked ? '❤️' : '🤍'} {likes} likes
+            </button>
+          </div>
+        </div>
+      </Link>
+    </div>
+  );
+}
+
+export default MovieCard;
+</script></div>
+    </article>
+
+    <article class="tile s2">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">Effet de survol</h3></div><span class="ftag f4">Navigation</span></div>
+      <p>Ajoute ces règles à la fin de <code>src/index.css</code> : la carte se soulève au survol.</p>
+      <div class="code" data-lang="css" data-file="src/index.css"><script type="text/plain">
+/* src/index.css - Ajoute à la fin */
+.hover-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hover-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+</script></div>
+    </article>
+
+    <article class="tile s4">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">Brancher le routeur dans App.jsx</h3></div><span class="ftag f4">Navigation</span></div>
+      <p>La route <code>path="*"</code> attrape toutes les URL inconnues : c'est ta page 404.</p>
+      <div class="code" data-lang="jsx" data-file="src/App.jsx"><script type="text/plain">
+// src/App.jsx
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import MovieDetails from './pages/MovieDetails';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Navbar />
+      <div className="container">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/movie/:id" element={<MovieDetails />} />
+          {/* On ajoutera les autres routes plus tard */}
+          <Route path="*" element={
+            <div className="alert alert-warning mt-5">
+              <h2>404 - Page non trouvée</h2>
+              <p>Cette page n'existe pas.</p>
+            </div>
+          } />
+        </Routes>
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+</script></div>
+    </article>
+
+    <article class="tile s2 t-blue">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-book"/></svg></span><div><p class="eyebrow">Référence</p><h3 class="section-title">Les hooks de React Router</h3></div><span class="ftag f4">Navigation</span></div>
+      <div class="code" data-lang="jsx" data-file="useParams · useNavigate · useLocation"><script type="text/plain">
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+
+// useParams : paramètres d'URL
+const { id } = useParams(); // "123" si URL = /movie/123
+
+// useNavigate : navigation programmatique
+const navigate = useNavigate();
+navigate('/about');                       // Aller à une page
+navigate(-1);                             // Retour arrière
+navigate('/login', { replace: true });    // Remplacer dans l'historique
+
+// useLocation : infos sur l'URL actuelle
+const location = useLocation();
+console.log(location.pathname); // "/movie/123"
+console.log(location.search);   // "?sort=rating"
+</script></div>
+    </article>
+
+    <article class="tile s2 t-lilac">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-table"/></svg></span><div><p class="eyebrow">Récapitulatif</p><h3 class="section-title">Le vocabulaire du routeur</h3></div></div>
+      <div class="tbl"><table>
+        <thead><tr><th>Élément</th><th>Utilité</th></tr></thead>
+        <tbody>
+          <tr><td>BrowserRouter</td><td>Enveloppe toute l'application</td></tr>
+          <tr><td>Routes</td><td>Conteneur des routes</td></tr>
+          <tr><td>Route</td><td>Associe une URL à un composant</td></tr>
+          <tr><td>Link</td><td>Navigation sans rechargement</td></tr>
+          <tr><td>NavLink</td><td>Lien avec classe active automatique</td></tr>
+          <tr><td>useParams</td><td>Lire les paramètres d'URL</td></tr>
+          <tr><td>useNavigate</td><td>Naviguer depuis le code</td></tr>
+        </tbody>
+      </table></div>
+    </article>
+
+    <article class="tile s4 t-mint">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-check"/></svg></span><div><p class="eyebrow">Point de vérification</p><h3 class="section-title">Navigation opérationnelle</h3></div></div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="c-router-1" data-check><span>La navbar s'affiche sur toutes les pages</span></label>
+        <label class="check"><input type="checkbox" id="c-router-2" data-check><span>Clic sur une carte → page de détails</span></label>
+        <label class="check"><input type="checkbox" id="c-router-3" data-check><span>Synopsis et casting affichés</span></label>
+        <label class="check"><input type="checkbox" id="c-router-4" data-check><span>Le bouton Retour fonctionne</span></label>
+        <label class="check"><input type="checkbox" id="c-router-5" data-check><span>Filtre par genre et recherche opérationnels</span></label>
+        <label class="check"><input type="checkbox" id="c-router-6" data-check><span>L'URL change dans le navigateur</span></label>
+        <label class="check"><input type="checkbox" id="c-router-7" data-check><span>Une URL inconnue affiche la 404</span></label>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ TODOS ============ -->
+<section class="panel" id="todos" role="tabpanel" aria-labelledby="tab-todos" hidden>
+  <div class="sec-intro"><h2>Application Todos et formulaires contrôlés</h2><span class="muted">Un CRUD complet : Create, Read, Update, Delete.</span></div>
+  <div class="grid">
+    <article class="tile s2 t-blue">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-book"/></svg></span><div><p class="eyebrow">Théorie</p><h3 class="section-title">Les formulaires contrôlés</h3></div><span class="ftag f5">Formulaires</span></div>
+      <p>Dans un formulaire contrôlé, la valeur du champ vient du <strong>state</strong>, et chaque frappe met le state à jour.</p>
+      <div class="code" data-lang="jsx" data-file="Exemple"><script type="text/plain">
+import { useState } from 'react';
+
+function FormExample() {
+  const [name, setName] = useState('');
+
+  return (
+    <input
+      type="text"
+      value={name}                               // Valeur contrôlée par React
+      onChange={(e) => setName(e.target.value)}  // Mise à jour du state
+    />
+  );
+}
+</script></div>
+      <p><strong>Avantages :</strong> validation en temps réel, contrôle total sur les données, réinitialisation facile, synchronisation avec le state.</p>
+    </article>
+
+    <article class="tile s2 t-peach">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-alert"/></svg></span><div><p class="eyebrow">À savoir</p><h3 class="section-title">JSONPlaceholder simule les écritures</h3></div></div>
+      <p>JSONPlaceholder est une API de <strong>simulation</strong>. Les ajouts, modifications et suppressions renvoient une réponse comme si tout avait fonctionné, mais rien n'est réellement enregistré côté serveur.</p>
+      <p>C'est pour ça qu'on met aussi à jour le <strong>state local</strong> après chaque appel : c'est lui qui fait foi à l'écran. Recharge la page et tu retrouveras les 20 tâches d'origine.</p>
+      <p class="muted">Conséquence : tous les nouveaux todos reçoivent l'id 201. Évite de les modifier entre eux, ils partagent la même <code>key</code>.</p>
+    </article>
+
+    <article class="tile s4">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">Le service API Todos</h3></div><span class="ftag f5">CRUD</span></div>
+      <p>Une fonction par opération : <code>GET</code>, <code>POST</code>, <code>PATCH</code>, <code>DELETE</code>.</p>
+      <div class="code" data-lang="javascript" data-file="src/services/todosApi.js"><script type="text/plain">
+// src/services/todosApi.js
+
+const BASE_URL = 'https://jsonplaceholder.typicode.com/todos';
+
+// Récupérer tous les todos (limité à 20)
+export async function getTodos() {
+  try {
+    const response = await fetch(`${BASE_URL}?_limit=20`);
+    return await response.json();
+  } catch (error) {
+    console.error('Erreur lors de la récupération des todos:', error);
+    return [];
+  }
+}
+
+// Ajouter un todo
+export async function addTodo(title) {
+  try {
+    const response = await fetch(BASE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        title,
+        completed: false,
+        userId: 1
+      })
+    });
+    return await response.json();
+  } catch (error) {
+    console.error('Erreur lors de l\'ajout:', error);
+    return null;
+  }
+}
+
+// Mettre à jour un todo
+export async function updateTodo(id, completed) {
+  try {
+    const response = await fetch(`${BASE_URL}/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ completed })
+    });
+    return await response.json();
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour:', error);
+    return null;
+  }
+}
+
+// Supprimer un todo
+export async function deleteTodo(id) {
+  try {
+    const response = await fetch(`${BASE_URL}/${id}`, {
+      method: 'DELETE'
+    });
+    return response.ok;
+  } catch (error) {
+    console.error('Erreur lors de la suppression:', error);
+    return false;
+  }
+}
+</script></div>
+    </article>
+
+    <article class="tile s2">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">Une tâche : TodoItem</h3></div><span class="ftag f5">CRUD</span></div>
+      <p>Le composant reçoit la tâche et deux fonctions de rappel, <code>onToggle</code> et <code>onDelete</code>. Il n'a aucun state : c'est le parent qui décide.</p>
+      <div class="code" data-lang="jsx" data-file="src/components/TodoItem.jsx"><script type="text/plain">
+// src/components/TodoItem.jsx
+function TodoItem({ todo, onToggle, onDelete }) {
+  return (
+    <li className="list-group-item d-flex justify-content-between align-items-center">
+      <div className="form-check">
+        <input
+          className="form-check-input"
+          type="checkbox"
+          checked={todo.completed}
+          onChange={() => onToggle(todo.id)}
+          id={`todo-${todo.id}`}
+        />
+        <label
+          className={`form-check-label ms-2 ${todo.completed ? 'text-decoration-line-through text-muted' : ''}`}
+          htmlFor={`todo-${todo.id}`}
+        >
+          {todo.title}
+        </label>
+      </div>
+
+      <button
+        className="btn btn-sm btn-danger"
+        onClick={() => onDelete(todo.id)}
+      >
+        🗑️
+      </button>
+    </li>
+  );
+}
+
+export default TodoItem;
+</script></div>
+    </article>
+
+    <article class="tile s2">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-form"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">Le formulaire d'ajout : TodoForm</h3></div><span class="ftag f5">Formulaires</span></div>
+      <ul>
+        <li><code>value={title}</code> : la valeur vient du state</li>
+        <li><code>onChange</code> : met à jour le state à chaque frappe</li>
+        <li><code>e.preventDefault()</code> : empêche le rechargement de la page</li>
+        <li><code>setTitle('')</code> : vide le champ après l'ajout</li>
+      </ul>
+      <div class="code" data-lang="jsx" data-file="src/components/TodoForm.jsx"><script type="text/plain">
+// src/components/TodoForm.jsx
+import { useState } from 'react';
+
+function TodoForm({ onAdd }) {
+  const [title, setTitle] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Empêcher le rechargement de la page
+
+    // Validation
+    if (title.trim() === '') {
+      alert('Veuillez entrer une tâche');
+      return;
+    }
+
+    setIsSubmitting(true);
+    await onAdd(title);
+    setTitle(''); // Réinitialiser le champ
+    setIsSubmitting(false);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="mb-4">
+      <div className="input-group input-group-lg">
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Ajouter une nouvelle tâche..."
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          disabled={isSubmitting}
+        />
+        <button
+          className="btn btn-primary"
+          type="submit"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? '...' : '+ Ajouter'}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+export default TodoForm;
+</script></div>
+    </article>
+
+    <article class="tile s4">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">La page Todos complète</h3></div><span class="ftag f5">CRUD</span></div>
+      <p>Elle orchestre tout : chargement, ajout, bascule, suppression avec confirmation, filtres et statistiques calculées à partir du state.</p>
+      <div class="code" data-lang="jsx" data-file="src/pages/Todos.jsx"><script type="text/plain">
+// src/pages/Todos.jsx
+import { useState, useEffect } from 'react';
+import TodoForm from '../components/TodoForm';
+import TodoItem from '../components/TodoItem';
+import { getTodos, addTodo, updateTodo, deleteTodo } from '../services/todosApi';
+
+function Todos() {
+  const [todos, setTodos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('all'); // all, active, completed
+
+  // Charger les todos au montage
+  useEffect(() => {
+    async function loadTodos() {
+      setLoading(true);
+      const data = await getTodos();
+      setTodos(data);
+      setLoading(false);
+    }
+
+    loadTodos();
+  }, []);
+
+  // Ajouter un todo
+  const handleAdd = async (title) => {
+    const newTodo = await addTodo(title);
+
+    if (newTodo) {
+      // Ajouter au début de la liste
+      setTodos([newTodo, ...todos]);
+    }
+  };
+
+  // Basculer le statut d'un todo
+  const handleToggle = async (id) => {
+    // Trouver le todo
+    const todo = todos.find(t => t.id === id);
+
+    // Mettre à jour via l'API
+    await updateTodo(id, !todo.completed);
+
+    // Mettre à jour le state local
+    setTodos(todos.map(t =>
+      t.id === id ? { ...t, completed: !t.completed } : t
+    ));
+  };
+
+  // Supprimer un todo
+  const handleDelete = async (id) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
+      const success = await deleteTodo(id);
+
+      if (success) {
+        setTodos(todos.filter(t => t.id !== id));
+      }
+    }
+  };
+
+  // Filtrer les todos
+  const filteredTodos = todos.filter(todo => {
+    if (filter === 'active') return !todo.completed;
+    if (filter === 'completed') return todo.completed;
+    return true; // 'all'
+  });
+
+  // Statistiques
+  const totalTodos = todos.length;
+  const completedTodos = todos.filter(t => t.completed).length;
+  const activeTodos = totalTodos - completedTodos;
+
+  if (loading) {
+    return (
+      <div className="text-center mt-5">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Chargement...</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h1 className="mb-4">✅ Mes Tâches</h1>
+
+      {/* Statistiques */}
+      <div className="row mb-4">
+        <div className="col-md-4">
+          <div className="card text-center">
+            <div className="card-body">
+              <h5 className="card-title">{totalTodos}</h5>
+              <p className="card-text text-muted">Total</p>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="card text-center">
+            <div className="card-body">
+              <h5 className="card-title text-warning">{activeTodos}</h5>
+              <p className="card-text text-muted">En cours</p>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="card text-center">
+            <div className="card-body">
+              <h5 className="card-title text-success">{completedTodos}</h5>
+              <p className="card-text text-muted">Terminées</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Formulaire d'ajout */}
+      <TodoForm onAdd={handleAdd} />
+
+      {/* Filtres */}
+      <div className="btn-group mb-3" role="group">
+        <button
+          className={`btn ${filter === 'all' ? 'btn-primary' : 'btn-outline-primary'}`}
+          onClick={() => setFilter('all')}
+        >
+          Toutes ({totalTodos})
+        </button>
+        <button
+          className={`btn ${filter === 'active' ? 'btn-primary' : 'btn-outline-primary'}`}
+          onClick={() => setFilter('active')}
+        >
+          En cours ({activeTodos})
+        </button>
+        <button
+          className={`btn ${filter === 'completed' ? 'btn-primary' : 'btn-outline-primary'}`}
+          onClick={() => setFilter('completed')}
+        >
+          Terminées ({completedTodos})
+        </button>
+      </div>
+
+      {/* Liste des todos */}
+      {filteredTodos.length === 0 ? (
+        <div className="alert alert-info">
+          Aucune tâche à afficher. {filter !== 'all' && 'Essayez un autre filtre.'}
+        </div>
+      ) : (
+        <ul className="list-group">
+          {filteredTodos.map(todo => (
+            <TodoItem
+              key={todo.id}
+              todo={todo}
+              onToggle={handleToggle}
+              onDelete={handleDelete}
+            />
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+export default Todos;
+</script></div>
+    </article>
+
+    <article class="tile s2">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-route"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">Ajouter la route /todos</h3></div><span class="ftag f4">Navigation</span></div>
+      <div class="code" data-lang="jsx" data-file="src/App.jsx"><script type="text/plain">
+// src/App.jsx
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import MovieDetails from './pages/MovieDetails';
+import Todos from './pages/Todos';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Navbar />
+      <div className="container">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/movie/:id" element={<MovieDetails />} />
+          <Route path="/todos" element={<Todos />} />
+          <Route path="*" element={
+            <div className="alert alert-warning mt-5">
+              <h2>404 - Page non trouvée</h2>
+            </div>
+          } />
+        </Routes>
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+</script></div>
+    </article>
+
+    <article class="tile s2">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-form"/></svg></span><div><p class="eyebrow">Pratique avancée</p><h3 class="section-title">Validation : TodoEditForm</h3></div><span class="ftag f5">Formulaires</span></div>
+      <p>Un formulaire d'édition avec un state dédié aux erreurs : titre vide, moins de 3 ou plus de 100 caractères.</p>
+      <div class="code" data-lang="jsx" data-file="src/components/TodoEditForm.jsx"><script type="text/plain">
+// src/components/TodoEditForm.jsx
+import { useState } from 'react';
+
+function TodoEditForm({ todo, onSave, onCancel }) {
+  const [title, setTitle] = useState(todo.title);
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (title.trim() === '') {
+      newErrors.title = 'Le titre ne peut pas être vide';
+    } else if (title.length < 3) {
+      newErrors.title = 'Le titre doit contenir au moins 3 caractères';
+    } else if (title.length > 100) {
+      newErrors.title = 'Le titre ne peut pas dépasser 100 caractères';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (validate()) {
+      onSave({ ...todo, title });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="p-3 border rounded mb-3">
+      <div className="mb-3">
+        <label htmlFor="edit-title" className="form-label">
+          Modifier la tâche
+        </label>
+        <input
+          type="text"
+          className={`form-control ${errors.title ? 'is-invalid' : ''}`}
+          id="edit-title"
+          value={title}
+          onChange={(e) => {
+            setTitle(e.target.value);
+            // Effacer l'erreur quand on tape
+            if (errors.title) {
+              setErrors({});
+            }
+          }}
+        />
+        {errors.title && (
+          <div className="invalid-feedback d-block">
+            {errors.title}
+          </div>
+        )}
+        <div className="form-text">
+          {title.length}/100 caractères
+        </div>
+      </div>
+
+      <div className="d-flex gap-2">
+        <button type="submit" className="btn btn-success">
+          💾 Sauvegarder
+        </button>
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={onCancel}
+        >
+          Annuler
+        </button>
+      </div>
+    </form>
+  );
+}
+
+export default TodoEditForm;
+</script></div>
+    </article>
+
+    <article class="tile s2 t-blue">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-book"/></svg></span><div><p class="eyebrow">Concepts</p><h3 class="section-title">Contrôlé vs non contrôlé, validation</h3></div><span class="ftag f5">Formulaires</span></div>
+      <div class="code" data-lang="jsx" data-file="Exemple"><script type="text/plain">
+// ✅ Contrôlé (recommandé)
+const [value, setValue] = useState('');
+<input value={value} onChange={(e) => setValue(e.target.value)} />
+
+// ❌ Non contrôlé (éviter ici)
+<input ref={inputRef} />
+
+// Validation en temps réel
+const [email, setEmail] = useState('');
+const [error, setError] = useState('');
+
+const handleChange = (e) => {
+  const value = e.target.value;
+  setEmail(value);
+
+  if (!value.includes('@')) {
+    setError('Email invalide');
+  } else {
+    setError('');
+  }
+};
+</script></div>
+    </article>
+
+    <article class="tile s2 t-blue">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-book"/></svg></span><div><p class="eyebrow">Concepts</p><h3 class="section-title">Plusieurs champs, types d'inputs</h3></div><span class="ftag f5">Formulaires</span></div>
+      <div class="code" data-lang="jsx" data-file="Exemple"><script type="text/plain">
+// Un seul state et un seul handler pour plusieurs champs
+const [formData, setFormData] = useState({ name: '', email: '', age: '' });
+
+const handleChange = (e) => {
+  const { name, value } = e.target;
+  setFormData(prev => ({ ...prev, [name]: value }));
+};
+
+<input name="name" value={formData.name} onChange={handleChange} />
+<input name="email" value={formData.email} onChange={handleChange} />
+
+// Types d'inputs
+<input type="text" value={text} onChange={e => setText(e.target.value)} />
+<input type="checkbox" checked={isChecked} onChange={e => setIsChecked(e.target.checked)} />
+<input type="radio" checked={option === 'a'} onChange={() => setOption('a')} />
+<select value={selected} onChange={e => setSelected(e.target.value)}>
+  <option value="1">Option 1</option>
+</select>
+<textarea value={text} onChange={e => setText(e.target.value)} />
+</script></div>
+    </article>
+
+    <article class="tile s2 t-lilac">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-layers"/></svg></span><div><p class="eyebrow">Modèle réutilisable</p><h3 class="section-title">Le pattern CRUD</h3></div><span class="ftag f5">CRUD</span></div>
+      <div class="code" data-lang="jsx" data-file="Pattern"><script type="text/plain">
+function CrudExample() {
+  const [items, setItems] = useState([]);
+
+  // CREATE
+  const handleCreate = async (newItem) => {
+    const created = await api.create(newItem);
+    setItems([...items, created]);
+  };
+
+  // READ (dans useEffect)
+  useEffect(() => {
+    async function load() {
+      const data = await api.getAll();
+      setItems(data);
+    }
+    load();
+  }, []);
+
+  // UPDATE
+  const handleUpdate = async (id, updates) => {
+    await api.update(id, updates);
+    setItems(items.map(item =>
+      item.id === id ? { ...item, ...updates } : item
+    ));
+  };
+
+  // DELETE
+  const handleDelete = async (id) => {
+    await api.delete(id);
+    setItems(items.filter(item => item.id !== id));
+  };
+}
+</script></div>
+    </article>
+
+    <article class="tile s2 t-lilac">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-table"/></svg></span><div><p class="eyebrow">Récapitulatif</p><h3 class="section-title">Fonctionnalité → concept</h3></div></div>
+      <div class="tbl"><table>
+        <thead><tr><th>Fonctionnalité</th><th>Concept utilisé</th></tr></thead>
+        <tbody>
+          <tr><td>Afficher les todos</td><td><code>useEffect</code> + API GET</td></tr>
+          <tr><td>Ajouter</td><td>Formulaire contrôlé + API POST</td></tr>
+          <tr><td>Cocher / décocher</td><td>Mise à jour du state + API PATCH</td></tr>
+          <tr><td>Supprimer</td><td>Confirmation + API DELETE</td></tr>
+          <tr><td>Filtrer</td><td>State + rendu conditionnel</td></tr>
+          <tr><td>Valider</td><td>State dédié aux erreurs</td></tr>
+          <tr><td>Statistiques</td><td>Valeurs calculées à partir du state</td></tr>
+        </tbody>
+      </table></div>
+    </article>
+
+    <article class="tile s4 t-mint">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-check"/></svg></span><div><p class="eyebrow">Point de vérification</p><h3 class="section-title">CRUD opérationnel</h3></div></div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="c-todos-1" data-check><span>Page Todos accessible depuis la navbar</span></label>
+        <label class="check"><input type="checkbox" id="c-todos-2" data-check><span>20 tâches chargées</span></label>
+        <label class="check"><input type="checkbox" id="c-todos-3" data-check><span>L'ajout d'une tâche fonctionne</span></label>
+        <label class="check"><input type="checkbox" id="c-todos-4" data-check><span>Cocher / décocher fonctionne</span></label>
+        <label class="check"><input type="checkbox" id="c-todos-5" data-check><span>Suppression avec confirmation</span></label>
+        <label class="check"><input type="checkbox" id="c-todos-6" data-check><span>Les filtres fonctionnent</span></label>
+        <label class="check"><input type="checkbox" id="c-todos-7" data-check><span>Les statistiques se mettent à jour</span></label>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ CONTACT & BONUS ============ -->
+<section class="panel" id="bonus" role="tabpanel" aria-labelledby="tab-bonus" hidden>
+  <div class="sec-intro"><h2>Page Contact et concepts bonus</h2><span class="muted">Un formulaire complet, puis l'état global avec useContext et useReducer.</span></div>
+  <div class="grid">
+    <article class="tile s4">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-form"/></svg></span><div><p class="eyebrow">Pratique</p><h3 class="section-title">La page Contact</h3></div><span class="ftag f5">Formulaires</span></div>
+      <p>Cinq champs dans un seul objet de state, un handler générique qui gère aussi la case à cocher, une validation complète (email par expression régulière) et un envoi simulé.</p>
+      <div class="code" data-lang="jsx" data-file="src/pages/Contact.jsx"><script type="text/plain">
+// src/pages/Contact.jsx
+import { useState } from 'react';
+
+function Contact() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+    acceptTerms: false
+  });
+
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  // Gestion des changements de champs
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+
+    // Effacer l'erreur du champ modifié
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  // Validation du formulaire
+  const validate = () => {
+    const newErrors = {};
+
+    // Validation du nom
+    if (!formData.name.trim()) {
+      newErrors.name = 'Le nom est requis';
+    } else if (formData.name.length < 2) {
+      newErrors.name = 'Le nom doit contenir au moins 2 caractères';
+    }
+
+    // Validation de l'email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim()) {
+      newErrors.email = 'L\'email est requis';
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = 'L\'email est invalide';
+    }
+
+    // Validation du sujet
+    if (!formData.subject.trim()) {
+      newErrors.subject = 'Le sujet est requis';
+    }
+
+    // Validation du message
+    if (!formData.message.trim()) {
+      newErrors.message = 'Le message est requis';
+    } else if (formData.message.length < 10) {
+      newErrors.message = 'Le message doit contenir au moins 10 caractères';
+    }
+
+    // Validation de la checkbox
+    if (!formData.acceptTerms) {
+      newErrors.acceptTerms = 'Vous devez accepter les conditions';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Soumission du formulaire
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validate()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    // Simulation d'un envoi (remplace par un vrai appel API)
+    setTimeout(() => {
+      console.log('Données du formulaire:', formData);
+      setSubmitSuccess(true);
+      setIsSubmitting(false);
+
+      // Réinitialiser le formulaire
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: '',
+        acceptTerms: false
+      });
+
+      // Masquer le message de succès après 5 secondes
+      setTimeout(() => setSubmitSuccess(false), 5000);
+    }, 1500);
+  };
+
+  return (
+    <div className="row justify-content-center">
+      <div className="col-md-8">
+        <h1 className="mb-4">📬 Contactez-nous</h1>
+
+        {submitSuccess && (
+          <div className="alert alert-success alert-dismissible fade show">
+            <strong>✅ Message envoyé !</strong> Nous vous répondrons dans les plus brefs délais.
+            <button
+              type="button"
+              className="btn-close"
+              onClick={() => setSubmitSuccess(false)}
+            ></button>
+          </div>
+        )}
+
+        <div className="card shadow">
+          <div className="card-body p-4">
+            <form onSubmit={handleSubmit} noValidate>
+              {/* Nom */}
+              <div className="mb-3">
+                <label htmlFor="name" className="form-label">
+                  Nom complet <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Votre nom"
+                />
+                {errors.name && (
+                  <div className="invalid-feedback">{errors.name}</div>
+                )}
+              </div>
+
+              {/* Email */}
+              <div className="mb-3">
+                <label htmlFor="email" className="form-label">
+                  Email <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="email"
+                  className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="votre@email.com"
+                />
+                {errors.email && (
+                  <div className="invalid-feedback">{errors.email}</div>
+                )}
+              </div>
+
+              {/* Sujet */}
+              <div className="mb-3">
+                <label htmlFor="subject" className="form-label">
+                  Sujet <span className="text-danger">*</span>
+                </label>
+                <select
+                  className={`form-select ${errors.subject ? 'is-invalid' : ''}`}
+                  id="subject"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                >
+                  <option value="">Choisissez un sujet</option>
+                  <option value="question">Question générale</option>
+                  <option value="bug">Signaler un bug</option>
+                  <option value="feature">Demande de fonctionnalité</option>
+                  <option value="other">Autre</option>
+                </select>
+                {errors.subject && (
+                  <div className="invalid-feedback">{errors.subject}</div>
+                )}
+              </div>
+
+              {/* Message */}
+              <div className="mb-3">
+                <label htmlFor="message" className="form-label">
+                  Message <span className="text-danger">*</span>
+                </label>
+                <textarea
+                  className={`form-control ${errors.message ? 'is-invalid' : ''}`}
+                  id="message"
+                  name="message"
+                  rows="5"
+                  value={formData.message}
+                  onChange={handleChange}
+                  placeholder="Votre message..."
+                ></textarea>
+                {errors.message && (
+                  <div className="invalid-feedback">{errors.message}</div>
+                )}
+                <div className="form-text">
+                  {formData.message.length}/500 caractères
+                </div>
+              </div>
+
+              {/* Checkbox */}
+              <div className="mb-3 form-check">
+                <input
+                  type="checkbox"
+                  className={`form-check-input ${errors.acceptTerms ? 'is-invalid' : ''}`}
+                  id="acceptTerms"
+                  name="acceptTerms"
+                  checked={formData.acceptTerms}
+                  onChange={handleChange}
+                />
+                <label className="form-check-label" htmlFor="acceptTerms">
+                  J'accepte les conditions d'utilisation
+                </label>
+                {errors.acceptTerms && (
+                  <div className="invalid-feedback d-block">
+                    {errors.acceptTerms}
+                  </div>
+                )}
+              </div>
+
+              {/* Bouton submit */}
+              <button
+                type="submit"
+                className="btn btn-primary btn-lg w-100"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2"></span>
+                    Envoi en cours...
+                  </>
+                ) : (
+                  '📨 Envoyer le message'
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {/* Informations de contact */}
+        <div className="row mt-4">
+          <div className="col-md-4">
+            <div className="card text-center">
+              <div className="card-body">
+                <h5>📍 Adresse</h5>
+                <p className="text-muted">123 Rue du Web<br />75001 Paris</p>
+              </div>
+            </div>
+          </div>
+          <div className="col-md-4">
+            <div className="card text-center">
+              <div className="card-body">
+                <h5>📧 Email</h5>
+                <p className="text-muted">contact@streamtech.fr</p>
+              </div>
+            </div>
+          </div>
+          <div className="col-md-4">
+            <div className="card text-center">
+              <div className="card-body">
+                <h5>📞 Téléphone</h5>
+                <p className="text-muted">01 23 45 67 89</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Contact;
+</script></div>
+      <div class="code" data-lang="jsx" data-file="src/App.jsx (ajouts)"><script type="text/plain">
+// Dans App.jsx, ajoute l'import
+import Contact from './pages/Contact';
+
+// Et ajoute la route
+<Route path="/contact" element={<Contact />} />
+</script></div>
+    </article>
+
+    <article class="tile s2 t-blue">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-star"/></svg></span><div><p class="eyebrow">Bonus 1 · Théorie</p><h3 class="section-title">useContext : un état global</h3></div><span class="ftag f5">État global</span></div>
+      <p>Partager une donnée (thème, utilisateur connecté) dans toute l'app sans la faire descendre de props en props.</p>
+      <div class="code" data-lang="jsx" data-file="Exemple"><script type="text/plain">
+// 1. Créer le contexte
+const ThemeContext = createContext();
+
+// 2. Fournir le contexte (Provider)
+function App() {
+  const [theme, setTheme] = useState('light');
+
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      <MyComponents />
+    </ThemeContext.Provider>
+  );
+}
+
+// 3. Consommer le contexte
+function MyComponent() {
+  const { theme, setTheme } = useContext(ThemeContext);
+  return <div>Theme: {theme}</div>;
+}
+</script></div>
+    </article>
+
+    <article class="tile s2">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Bonus 1 · Pratique</p><h3 class="section-title">Un système de thème clair / sombre</h3></div><span class="ftag f5">État global</span></div>
+      <p>Le contexte expose <code>theme</code> et <code>toggleTheme</code>, mémorise le choix dans <code>localStorage</code> et l'applique via l'attribut <code>data-bs-theme</code> de Bootstrap.</p>
+      <div class="code" data-lang="jsx" data-file="src/contexts/ThemeContext.jsx"><script type="text/plain">
+// src/contexts/ThemeContext.jsx
+import { createContext, useContext, useState, useEffect } from 'react';
+
+// 1. Créer le contexte
+const ThemeContext = createContext();
+
+// 2. Hook personnalisé pour utiliser le contexte
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme doit être utilisé dans un ThemeProvider');
+  }
+  return context;
+}
+
+// 3. Provider
+export function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState(() => {
+    // Récupérer le thème du localStorage
+    return localStorage.getItem('theme') || 'light';
+  });
+
+  useEffect(() => {
+    // Sauvegarder dans localStorage
+    localStorage.setItem('theme', theme);
+
+    // Appliquer le thème au body
+    document.body.setAttribute('data-bs-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+</script></div>
+    </article>
+
+    <article class="tile s2">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Bonus 1 · Pratique</p><h3 class="section-title">Envelopper l'app dans le Provider</h3></div><span class="ftag f5">État global</span></div>
+      <div class="code" data-lang="jsx" data-file="src/main.jsx"><script type="text/plain">
+// src/main.jsx
+import 'bootstrap/dist/css/bootstrap.min.css';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import './index.css'
+import { ThemeProvider } from './contexts/ThemeContext'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
+  </React.StrictMode>,
+)
+</script></div>
+    </article>
+
+    <article class="tile s2">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Bonus 1 · Pratique</p><h3 class="section-title">Le bouton de bascule dans la Navbar</h3></div><span class="ftag f5">État global</span></div>
+      <p>N'importe quel composant peut lire le thème avec <code>useTheme()</code>, sans aucune prop.</p>
+      <div class="code" data-lang="jsx" data-file="src/components/Navbar.jsx"><script type="text/plain">
+// src/components/Navbar.jsx
+import { Link, NavLink } from 'react-router-dom';
+import { useTheme } from '../contexts/ThemeContext';
+
+function Navbar() {
+  const { theme, toggleTheme } = useTheme();
+
+  return (
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+      <div className="container">
+        <Link className="navbar-brand" to="/">
+          🎬 StreamTech
+        </Link>
+
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <ul className="navbar-nav ms-auto">
+            <li className="nav-item">
+              <NavLink
+                className={({ isActive }) =>
+                  isActive ? 'nav-link active' : 'nav-link'
+                }
+                to="/"
+              >
+                Films
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink
+                className={({ isActive }) =>
+                  isActive ? 'nav-link active' : 'nav-link'
+                }
+                to="/todos"
+              >
+                Todos
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink
+                className={({ isActive }) =>
+                  isActive ? 'nav-link active' : 'nav-link'
+                }
+                to="/contact"
+              >
+                Contact
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <button
+                className="btn btn-outline-light ms-3"
+                onClick={toggleTheme}
+              >
+                {theme === 'light' ? '🌙' : '☀️'}
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+export default Navbar;
+</script></div>
+    </article>
+
+    <article class="tile s2 t-blue">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-star"/></svg></span><div><p class="eyebrow">Bonus 2 · Théorie</p><h3 class="section-title">useReducer : des états complexes</h3></div><span class="ftag f5">État global</span></div>
+      <p>Quand le state regroupe plusieurs valeurs liées et beaucoup d'actions, on centralise la logique dans un <strong>reducer</strong>, comme un Redux miniature.</p>
+      <div class="code" data-lang="jsx" data-file="Exemple"><script type="text/plain">
+// 1. Définir le reducer
+function reducer(state, action) {
+  switch (action.type) {
+    case 'INCREMENT':
+      return { count: state.count + 1 };
+    case 'DECREMENT':
+      return { count: state.count - 1 };
+    default:
+      return state;
+  }
+}
+
+// 2. Utiliser le reducer
+function Counter() {
+  const [state, dispatch] = useReducer(reducer, { count: 0 });
+
+  return (
+    <div>
+      <p>Count: {state.count}</p>
+      <button onClick={() => dispatch({ type: 'INCREMENT' })}>+</button>
+      <button onClick={() => dispatch({ type: 'DECREMENT' })}>-</button>
+    </div>
+  );
+}
+</script></div>
+    </article>
+
+    <article class="tile s2 t-lilac">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-table"/></svg></span><div><p class="eyebrow">Choisir</p><h3 class="section-title">useState ou useReducer ?</h3></div></div>
+      <div class="tbl"><table>
+        <thead><tr><th>useState quand…</th><th>useReducer quand…</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:500;white-space:normal">Le state est simple : une valeur, un objet simple</td><td>Le state est un objet à plusieurs propriétés liées</td></tr>
+          <tr><td style="font-weight:500;white-space:normal">Il y a peu de modifications</td><td>Il y a beaucoup d'actions différentes</td></tr>
+          <tr><td style="font-weight:500;white-space:normal">La logique reste simple</td><td>Les transitions sont complexes ou réutilisables</td></tr>
+        </tbody>
+      </table></div>
+      <div class="code" data-lang="jsx" data-file="Exemple"><script type="text/plain">
+const [count, setCount] = useState(0);
+
+const [state, dispatch] = useReducer(reducer, initialState);
+dispatch({ type: 'ADD_TODO', payload: todo });
+</script></div>
+    </article>
+
+    <article class="tile s4">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-code"/></svg></span><div><p class="eyebrow">Bonus 2 · Pratique</p><h3 class="section-title">Refactoriser Todos avec useReducer</h3></div><span class="ftag f5">État global</span></div>
+      <p>Même fonctionnalité que la page Todos, mais toute la gestion du state passe par un reducer. Pour la tester, ajoute une route, par exemple <code>&lt;Route path="/todos-advanced" element={&lt;TodosAdvanced /&gt;} /&gt;</code>.</p>
+      <div class="code" data-lang="jsx" data-file="src/pages/TodosAdvanced.jsx"><script type="text/plain">
+// src/pages/TodosAdvanced.jsx
+import { useReducer, useEffect } from 'react';
+import TodoForm from '../components/TodoForm';
+import TodoItem from '../components/TodoItem';
+import { getTodos, addTodo, updateTodo, deleteTodo } from '../services/todosApi';
+
+// 1. Définir les actions
+const ACTIONS = {
+  SET_TODOS: 'SET_TODOS',
+  ADD_TODO: 'ADD_TODO',
+  TOGGLE_TODO: 'TOGGLE_TODO',
+  DELETE_TODO: 'DELETE_TODO',
+  SET_FILTER: 'SET_FILTER',
+  SET_LOADING: 'SET_LOADING'
+};
+
+// 2. État initial
+const initialState = {
+  todos: [],
+  filter: 'all',
+  loading: true
+};
+
+// 3. Reducer
+function todosReducer(state, action) {
+  switch (action.type) {
+    case ACTIONS.SET_TODOS:
+      return {
+        ...state,
+        todos: action.payload,
+        loading: false
+      };
+
+    case ACTIONS.ADD_TODO:
+      return {
+        ...state,
+        todos: [action.payload, ...state.todos]
+      };
+
+    case ACTIONS.TOGGLE_TODO:
+      return {
+        ...state,
+        todos: state.todos.map(todo =>
+          todo.id === action.payload
+            ? { ...todo, completed: !todo.completed }
+            : todo
+        )
+      };
+
+    case ACTIONS.DELETE_TODO:
+      return {
+        ...state,
+        todos: state.todos.filter(todo => todo.id !== action.payload)
+      };
+
+    case ACTIONS.SET_FILTER:
+      return {
+        ...state,
+        filter: action.payload
+      };
+
+    case ACTIONS.SET_LOADING:
+      return {
+        ...state,
+        loading: action.payload
+      };
+
+    default:
+      return state;
+  }
+}
+
+function TodosAdvanced() {
+  const [state, dispatch] = useReducer(todosReducer, initialState);
+
+  useEffect(() => {
+    async function loadTodos() {
+      const data = await getTodos();
+      dispatch({ type: ACTIONS.SET_TODOS, payload: data });
+    }
+    loadTodos();
+  }, []);
+
+  const handleAdd = async (title) => {
+    const newTodo = await addTodo(title);
+    if (newTodo) {
+      dispatch({ type: ACTIONS.ADD_TODO, payload: newTodo });
+    }
+  };
+
+  const handleToggle = async (id) => {
+    const todo = state.todos.find(t => t.id === id);
+    await updateTodo(id, !todo.completed);
+    dispatch({ type: ACTIONS.TOGGLE_TODO, payload: id });
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Supprimer cette tâche ?')) {
+      const success = await deleteTodo(id);
+      if (success) {
+        dispatch({ type: ACTIONS.DELETE_TODO, payload: id });
+      }
+    }
+  };
+
+  const filteredTodos = state.todos.filter(todo => {
+    if (state.filter === 'active') return !todo.completed;
+    if (state.filter === 'completed') return todo.completed;
+    return true;
+  });
+
+  const totalTodos = state.todos.length;
+  const completedTodos = state.todos.filter(t => t.completed).length;
+  const activeTodos = totalTodos - completedTodos;
+
+  if (state.loading) {
+    return (
+      <div className="text-center mt-5">
+        <div className="spinner-border text-primary"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h1 className="mb-4">✅ Mes Tâches (avec useReducer)</h1>
+
+      {/* Statistiques */}
+      <div className="row mb-4">
+        <div className="col-md-4">
+          <div className="card text-center bg-primary text-white">
+            <div className="card-body">
+              <h2>{totalTodos}</h2>
+              <p>Total</p>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="card text-center bg-warning">
+            <div className="card-body">
+              <h2>{activeTodos}</h2>
+              <p>En cours</p>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="card text-center bg-success text-white">
+            <div className="card-body">
+              <h2>{completedTodos}</h2>
+              <p>Terminées</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <TodoForm onAdd={handleAdd} />
+
+      {/* Filtres */}
+      <div className="btn-group mb-3">
+        <button
+          className={`btn ${state.filter === 'all' ? 'btn-primary' : 'btn-outline-primary'}`}
+          onClick={() => dispatch({ type: ACTIONS.SET_FILTER, payload: 'all' })}
+        >
+          Toutes
+        </button>
+        <button
+          className={`btn ${state.filter === 'active' ? 'btn-primary' : 'btn-outline-primary'}`}
+          onClick={() => dispatch({ type: ACTIONS.SET_FILTER, payload: 'active' })}
+        >
+          En cours
+        </button>
+        <button
+          className={`btn ${state.filter === 'completed' ? 'btn-primary' : 'btn-outline-primary'}`}
+          onClick={() => dispatch({ type: ACTIONS.SET_FILTER, payload: 'completed' })}
+        >
+          Terminées
+        </button>
+      </div>
+
+      <ul className="list-group">
+        {filteredTodos.map(todo => (
+          <TodoItem
+            key={todo.id}
+            todo={todo}
+            onToggle={handleToggle}
+            onDelete={handleDelete}
+          />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default TodosAdvanced;
+</script></div>
+    </article>
+
+    <article class="tile s4 t-mint">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-check"/></svg></span><div><p class="eyebrow">Point de vérification</p><h3 class="section-title">Contact et thème</h3></div></div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="c-bonus-1" data-check><span>Formulaire vide soumis → erreurs affichées</span></label>
+        <label class="check"><input type="checkbox" id="c-bonus-2" data-check><span>Les erreurs disparaissent en corrigeant</span></label>
+        <label class="check"><input type="checkbox" id="c-bonus-3" data-check><span>Formulaire valide → message de succès</span></label>
+        <label class="check"><input type="checkbox" id="c-bonus-4" data-check><span>Le formulaire se réinitialise</span></label>
+        <label class="check"><input type="checkbox" id="c-bonus-5" data-check><span>Le bouton 🌙 / ☀️ change le thème partout</span></label>
+        <label class="check"><input type="checkbox" id="c-bonus-6" data-check><span>Le thème est conservé après rechargement</span></label>
+        <label class="check"><input type="checkbox" id="c-bonus-7" data-check><span>TodosAdvanced fonctionne comme Todos</span></label>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ BILAN ============ -->
+<section class="panel" id="bilan" role="tabpanel" aria-labelledby="tab-bilan" hidden>
+  <div class="sec-intro"><h2>Bilan du cas pratique</h2><span class="muted">Ce que tu as construit, et la suite du parcours.</span></div>
+  <div class="grid">
+    <article class="tile s4 t-blue result">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-flag"/></svg></span><div><p class="eyebrow">Résultat</p><h3 class="section-title" id="resultMsg">Commence par le brief et l'installation.</h3></div></div>
+      <p class="score"><span id="scoreDone">0</span><small> / <span id="scoreTotal">0</span> points validés</small></p>
+      <div class="bar" style="background:#fff"><span id="barFill2"></span></div>
+      <button type="button" class="btn-ghost" id="resetBtn">Réinitialiser ma progression</button>
+    </article>
+
+    <article class="tile s2 t-lilac">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-layers"/></svg></span><div><p class="eyebrow">Concepts maîtrisés</p><h3 class="section-title">Dix notions React</h3></div></div>
+      <div class="tagrow">
+        <span class="ftag f1">Composants</span><span class="ftag f1">Props</span>
+        <span class="ftag f2">useState</span><span class="ftag f2">Rendu conditionnel</span><span class="ftag f2">Listes &amp; keys</span>
+        <span class="ftag f3">useEffect &amp; API</span>
+        <span class="ftag f4">React Router</span>
+        <span class="ftag f5">Formulaires contrôlés</span><span class="ftag f5">useContext</span><span class="ftag f5">useReducer</span>
+      </div>
+      <blockquote class="sarah"><span class="av">S</span><p><b>Sarah</b>Bravo pour ce parcours ! Continue d'expérimenter et d'ajouter des fonctionnalités : c'est en codant qu'on progresse le plus.</p></blockquote>
+    </article>
+
+    <article class="tile s2">
+      <div class="tile-head"><span class="icon-bg ib-mint"><svg><use href="#i-target"/></svg></span><div><p class="eyebrow">Livrable</p><h3 class="section-title">L'application StreamTech</h3></div></div>
+      <ul>
+        <li><strong>Films :</strong> populaires, recherche en temps réel, filtre par genre, page de détails avec casting</li>
+        <li><strong>Todos :</strong> CRUD complet, filtres, statistiques, validation</li>
+        <li><strong>Contact :</strong> formulaire multi-champs validé</li>
+        <li><strong>Thème :</strong> clair / sombre mémorisé</li>
+      </ul>
+    </article>
+
+    <article class="tile s4 t-mint">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-check"/></svg></span><div><p class="eyebrow">Checklist finale</p><h3 class="section-title">Avant de rendre ton projet</h3></div></div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="c-final-1" data-check><span>Films : recherche, filtres, détails</span></label>
+        <label class="check"><input type="checkbox" id="c-final-2" data-check><span>Todos : ajout, bascule, suppression, filtres</span></label>
+        <label class="check"><input type="checkbox" id="c-final-3" data-check><span>Contact : validation et soumission</span></label>
+        <label class="check"><input type="checkbox" id="c-final-4" data-check><span>Tous les liens de navigation fonctionnent</span></label>
+        <label class="check"><input type="checkbox" id="c-final-5" data-check><span>Le thème clair / sombre persiste</span></label>
+        <label class="check"><input type="checkbox" id="c-final-6" data-check><span>Aucune erreur dans la console</span></label>
+        <label class="check"><input type="checkbox" id="c-final-7" data-check><span>Application testée sur mobile</span></label>
+      </div>
+    </article>
+
+    <article class="tile s2 t-peach">
+      <div class="tile-head"><span class="icon-bg"><svg><use href="#i-bolt"/></svg></span><div><p class="eyebrow">Pour aller plus loin</p><h3 class="section-title">Prochaines étapes</h3></div></div>
+      <ul>
+        <li><strong>Tests :</strong> React Testing Library</li>
+        <li><strong>Performance :</strong> <code>React.memo</code>, <code>useMemo</code>, <code>useCallback</code></li>
+        <li><strong>Gestion d'état :</strong> Redux Toolkit ou Zustand</li>
+        <li><strong>Rendu serveur :</strong> Next.js</li>
+        <li><strong>Typage :</strong> TypeScript</li>
+        <li><strong>Styles :</strong> styled-components, Tailwind CSS</li>
+        <li><strong>Build :</strong> optimisation pour la production</li>
+      </ul>
+    </article>
+
+    <article class="tile s2">
+      <div class="tile-head"><span class="icon-bg ib-lilac"><svg><use href="#i-book"/></svg></span><div><p class="eyebrow">Ressources</p><h3 class="section-title">Continuer à apprendre</h3></div></div>
+      <ul>
+        <li>Documentation officielle : <a href="https://react.dev" target="_blank" rel="noopener">react.dev</a></li>
+        <li>Tutoriels vidéo : Grafikart, Coding in Flow</li>
+        <li>Projets d'entraînement : refaire un clone simplifié de Twitter ou d'Instagram</li>
+      </ul>
+    </article>
+  </div>
+</section>
+</main>
+</div>
+
+<script>window.Prism = window.Prism || {}; window.Prism.manual = true;</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-jsx.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script>
+(function () {
+  var KEY = 'streamtech-cas-react-corrige-v1';
+  var state = { tab: 'brief', checks: {} };
+  try { var s = JSON.parse(localStorage.getItem(KEY)); if (s) state = Object.assign(state, s); } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  /* Blocs de code */
+  document.querySelectorAll('.code').forEach(function (box) {
+    var src = box.querySelector('script[type="text/plain"]');
+    if (!src) return;
+    var text = src.textContent.replace(/^\s*\n/, '').replace(/\s+$/, '');
+    src.remove();
+    var lang = box.dataset.lang || 'none';
+    var file = box.dataset.file || '';
+
+    var body = document.createElement('div'); body.className = 'code-body';
+    var head = document.createElement('div'); head.className = 'code-head';
+    var f = document.createElement('span'); f.className = 'code-file'; f.textContent = file;
+    var l = document.createElement('span'); l.className = 'code-lang'; l.textContent = lang === 'none' ? 'texte' : lang;
+    var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'copy'; btn.textContent = 'Copier';
+    head.append(f, l, btn);
+    var pre = document.createElement('pre'); var code = document.createElement('code');
+    code.className = 'language-' + lang; code.textContent = text; pre.appendChild(code);
+    body.append(head, pre); box.appendChild(body);
+    if (window.Prism && lang !== 'none' && Prism.languages[lang]) { try { Prism.highlightElement(code); } catch (e) {} }
+
+    btn.addEventListener('click', function () {
+      function done(msg) { btn.textContent = msg; setTimeout(function () { btn.textContent = 'Copier'; }, 1600); }
+      function fallback() {
+        var r = document.createRange(); r.selectNodeContents(code);
+        var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+        done('Sélectionné, fais Ctrl+C');
+      }
+      try {
+        navigator.clipboard.writeText(text).then(function () { done('Copié'); }, fallback);
+      } catch (e) { fallback(); }
+    });
+  });
+
+  /* Onglets */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var ids = tabs.map(function (t) { return t.dataset.tab; });
+  function showTab(id, focus) {
+    if (ids.indexOf(id) < 0) id = 'brief';
+    tabs.forEach(function (t) {
+      var on = t.dataset.tab === id;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.dataset.tab).hidden = !on;
+      if (on && focus) t.focus();
+    });
+    state.tab = id; save();
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () {
+      showTab(t.dataset.tab);
+      var nav = document.querySelector('.tabs');
+      var y = nav.getBoundingClientRect().top + window.scrollY - 4;
+      if (window.scrollY > y) window.scrollTo({ top: y });
+    });
+    t.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') showTab(ids[(i + 1) % ids.length], true);
+      if (e.key === 'ArrowLeft') showTab(ids[(i - 1 + ids.length) % ids.length], true);
+    });
+  });
+  var hash = (location.hash || '').slice(1);
+  showTab(ids.indexOf(hash) >= 0 ? hash : state.tab);
+
+  /* Progression */
+  var checks = Array.prototype.slice.call(document.querySelectorAll('[data-check]'));
+  checks.forEach(function (c) {
+    c.checked = !!state.checks[c.id];
+    c.addEventListener('change', function () { state.checks[c.id] = c.checked; save(); update(); });
+  });
+  function update() {
+    var total = checks.length, done = checks.filter(function (c) { return c.checked; }).length;
+    var pct = total ? Math.round(done / total * 100) : 0;
+    document.getElementById('pct').textContent = pct;
+    document.getElementById('done').textContent = done;
+    document.getElementById('total').textContent = total;
+    document.getElementById('barFill').style.width = pct + '%';
+    document.getElementById('barFill2').style.width = pct + '%';
+    document.getElementById('bar').setAttribute('aria-valuenow', pct);
+    document.getElementById('scoreDone').textContent = done;
+    document.getElementById('scoreTotal').textContent = total;
+    var msg = 'Commence par le brief et l’installation.';
+    if (pct === 100) msg = 'Cas pratique terminé : ton application StreamTech est complète.';
+    else if (pct >= 75) msg = 'Dernière ligne droite : il reste quelques vérifications.';
+    else if (pct >= 40) msg = 'Belle progression, continue sur ta lancée.';
+    else if (done > 0) msg = 'Bon début : les fondations sont posées.';
+    document.getElementById('resultMsg').textContent = msg;
+    tabs.forEach(function (t) {
+      var list = checks.filter(function (c) { return document.getElementById(t.dataset.tab).contains(c); });
+      var cnt = t.querySelector('.cnt');
+      var d = list.filter(function (c) { return c.checked; }).length;
+      cnt.textContent = d + '/' + list.length;
+      cnt.classList.toggle('full', list.length > 0 && d === list.length);
+    });
+  }
+  update();
+
+  var rb = document.getElementById('resetBtn'), armed = null;
+  rb.addEventListener('click', function () {
+    if (!armed) {
+      rb.textContent = 'Clique à nouveau pour confirmer';
+      armed = setTimeout(function () { armed = null; rb.textContent = 'Réinitialiser ma progression'; }, 3000);
+      return;
+    }
+    clearTimeout(armed); armed = null;
+    state.checks = {}; checks.forEach(function (c) { c.checked = false; }); save(); update();
+    rb.textContent = 'Progression réinitialisée';
+    setTimeout(function () { rb.textContent = 'Réinitialiser ma progression'; }, 2000);
+  });
+})();
+</script>
+</body>
+</html>
